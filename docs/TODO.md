@@ -3,7 +3,7 @@
 ## PARSING
 
 ### 🔹 1. Lecture et gestion d’entrée
-- [ ] Lire la ligne de commande avec `readline()`
+- [x] Lire la ligne de commande avec `readline()`
 - [ ] Gérer l’historique (`add_history`)
 - [ ] Gérer les signaux (`Ctrl+C`, `Ctrl+D`, `Ctrl+\`) pendant la lecture
 - [ ] Nettoyer et libérer la mémoire de la ligne lue
