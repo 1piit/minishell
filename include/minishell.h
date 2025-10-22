@@ -70,23 +70,25 @@ typedef struct s_shell
 	t_env	*env;
 	t_cmd	*cmds;
 	int		last_status;
-	int		running;
+	int		running_status;
 }	t_shell;
 
 typedef enum e_tokentype
 {
+	T_INVALID = 0,
 	T_WORD,
 	T_PIPE,
 	T_REDIR_IN,
 	T_REDIR_OUT,
 	T_APPEND,
 	T_HEREDOC,
+	T_END
 }	t_tokentype;
 
 typedef struct s_token
 {
 	t_tokentype		type;
-	char			**value;
+	char			*word;
 	struct s_token	*next;
 }	t_token;
 
