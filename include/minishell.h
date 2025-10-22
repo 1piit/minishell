@@ -25,6 +25,7 @@
 # include <sys/stat.h>
 # include <string.h>
 # include <sys/wait.h>
+# include <errno.h>
 
 // === VERSION ===
 # define VERSION		"V0.2"
@@ -40,6 +41,76 @@
 # define PURPLE_LIGHT	"\001\033[1;35m\002"
 # define WHITE			"\001\033[1;37m\002"
 # define BLACK			"\001\033[30;47m\002"
+
+typedef struct s_env
+{
+	char			*key;
+	char			*value;
+	struct s_env	*next;
+}	t_env;
+
+typedef struct s_redir
+{
+	int				type;
+	char			*filename;
+	struct s_redir	*next;
+}	t_redir;
+
+typedef struct s_cmd
+{
+	char			**argv;
+	t_redir			*redir;
+	int				fd_in;
+	int				fd_out;
+	struct s_cmd	*next;
+}	t_cmd;
+
+typedef struct s_shell
+{
+	t_env	*env;
+	t_cmd	*cmds;
+	int		last_status;
+	int		running;
+}	t_shell;
+
+typedef enum e_tokentype
+{
+	T_WORD,
+	T_PIPE,
+	T_REDIR_IN,
+	T_REDIR_OUT,
+	T_APPEND,
+	T_HEREDOC,
+}	t_tokentype;
+
+typedef struct s_token
+{
+	t_tokentype		type;
+	char			**value;
+	struct s_token	*next;
+}	t_token;
+
+typedef struct s_exec
+{
+	int	pid;
+	int	fd_in;
+	int	fd_out;
+	int	pipe_fd[2];
+}	t_exec;
+
+typedef struct s_expand
+{
+	char	*result;
+	size_t	i;
+	size_t	j;
+}	t_expand;
+
+typedef struct s_heredoc
+{
+	char				*delimiter;
+	char				*content;
+	struct s_heredoc	*next;
+}	t_heredoc;
 
 // === BUILT-IN ===
 int		cd(char *path);
