@@ -46,7 +46,7 @@ int	main(int ac, char **av, char **envp)
 		i++;
 	alloc_env = malloc(sizeof(char *) * (i + 1));
 	if (!alloc_env)
-		return (1);
+		return (perror("Erreur allov_env: "), 1);
 	j = 0;
 	while (j < i)
 	{
@@ -67,17 +67,14 @@ int	main(int ac, char **av, char **envp)
 				"minishell " VERSION BLUE_DARK " (unknown)$ " NC);
 		line = readline(prompt);
 		if (!line)
-			break ;
+			return (perror("Error readline: "), 1);
 		if (line[0] != '\0')
 		{
 			add_history(line);
 
 			args = ft_split(line, ' ');
 			if (!args)
-			{
 				free(line);
-				continue ;
-			}
 			if (ft_strcmp(args[0], "cd") == 0)
 				cd(args[1]);
 			else if (ft_strcmp(args[0], "pwd") == 0)
