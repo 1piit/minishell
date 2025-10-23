@@ -1,5 +1,8 @@
 {
 	"files.associations": {
+
+		"stdlib.h": "c",
+		"typeinfo": "c"
 		"errno.h": "c"
 	}
 }

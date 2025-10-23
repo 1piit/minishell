@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@42.fr>                  +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/01 13:48:03 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/10/23 18:47:38 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,7 +127,11 @@ void	unset(char ***env, char **args);
 void	unset_var(char ***env, char *var);
 
 // === MINISHELL ===
-int		main(int ac, char **av, char **envp);
+//int		main(int ac, char **av, char **envp);
 char	**init_env(char **envp);
+
+// === TEST_UTILS ===
+void	assert_eq(int value, int expected, char *file, int line);
+void	assert_str_eq(char *value, char *expected, char *file, int line);
 
 #endif
