@@ -43,7 +43,7 @@ t_token	*add_token(t_lexer *lx, t_tokentype type, char *word)
 
 int	handle_operator(const char *line, int i, t_lexer *lx)
 {
-	if (line [i] == '>' && line[i + 1] == '>')
+	if (line[i] == '>' && line[i + 1] == '>')
 		return (add_token(lx, T_APPEND, ">>"), 2);
 	else if (line[i] == '<' && line[i + 1] == '<')
 		return (add_token(lx, T_HEREDOC, "<<"), 2);
