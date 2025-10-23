@@ -5,11 +5,11 @@ NAME = minishell
 
 # === DIR ===
 SRC_DIR = src
-TESTS_DIR = tests
+TEST_DIR = test
 OBJ_DIR = obj
 MS_OBJ_DIR = $(OBJ_DIR)/minishell
 LF_OBJ_DIR = $(OBJ_DIR)/libft
-TESTS_OBJ_DIR = $(OBJ_DIR)/tests
+TEST_OBJ_DIR = $(OBJ_DIR)/test
 
 # === SRC/OBJ ===
 #SRCS = $(wildcard $(SRC_DIR)/*.c $(SRC_DIR)/*/*.c)
@@ -18,10 +18,12 @@ LF_SRCS = $(wildcard Libft/*.c)
 MS_OBJS = $(patsubst $(SRC_DIR)/%.c,$(MS_OBJ_DIR)/%.o,$(SRCS))
 LF_OBJS = $(patsubst Libft/%.c,$(LF_OBJ_DIR)/%.o,$(LF_SRCS))
 
-# === TESTS ===
-TESTS_SRCS = $(shell find $(TESTS_DIR) -name "*.test.c")
-TESTS_OBJS = $(patsubst $(TESTS_DIR)/%.test.c,$(TESTS_OBJ_DIR)/%.test.o,$(TESTS_SRCS))
-TESTS_EXEC = $(patsubst $(TESTS_DIR)/%.test.c,$(TESTS_DIR)/%.test,$(TESTS_SRCS))
+# === TEST ===
+TEST_SRCS = $(shell find $(TEST_DIR) -name "*.test.c")
+TEST_OBJS = $(patsubst $(TEST_DIR)/%.test.c,$(TEST_OBJ_DIR)/%.test.o,$(TEST_SRCS))
+TEST_UTILS_SRC = $(TEST_DIR)/utils.c
+TEST_UTILS_OBJ = $(TEST_OBJ_DIR)/utils.o
+TEST_EXEC = $(patsubst $(TEST_DIR)/%.test.c,$(TEST_DIR)/%.test,$(TEST_SRCS))
 MS_OBJS_NO_MAIN = $(filter-out $(MS_OBJ_DIR)/main.o, $(MS_OBJS))
 
 # === CC ===
@@ -49,7 +51,7 @@ all: $(NAME)
 # ===================================================
 $(NAME): $(MS_OBJS) $(LF_OBJS)
 	@printf "$(YELLOW)Starting $(NAME) !$(NC)\n"
-	@$(C) $(CFLAGS) $(LF_OBJS) $(MS_OBJS) -o $(NAME) $(LDFLAGS) >/dev/null 2>&1
+	@$(C) $(CFLAGS) $(LF_OBJS) $(MS_OBJS) -o $(NAME) $(LDFLAGS)
 	@printf "$(CYAN)Compiling libft !$(NC)\n"
 	@printf "$(BLUE)Compiling minishell !$(NC)\n"
 	@printf "$(YELLOW)Loading: [          ]$(NC)\r"; sleep 0.2
@@ -86,28 +88,36 @@ MMMMMMMM               MMMMMMMMiiiiiiii nnnnnn    nnnnnniiiiiiii  sssssssssss   
 # ===================================================
 $(LF_OBJ_DIR)/%.o: Libft/%.c
 	@mkdir -p $(LF_OBJ_DIR)
-	@$(C) $(CFLAGS) -c $< -o $@ >/dev/null 2>&1
+#	@echo "Compiling $< → $@"
+	@$(C) $(CFLAGS) -c $< -o $@
 
 $(MS_OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(dir $@)
-	@$(C) $(CFLAGS) -c $< -o $@ >/dev/null 2>&1
+#	@echo "Compiling $< → $@"
+	@$(C) $(CFLAGS) -c $< -o $@
 
-$(TESTS_OBJ_DIR)/%.test.o: $(TESTS_DIR)/%.test.c
+$(TEST_OBJ_DIR)/utils.o: $(TEST_DIR)/utils.c
 	@mkdir -p $(dir $@)
-	@$(C) $(CFLAGS) -c $< -o $@ >/dev/null 2>&1
+#	@echo "Compiling $< → $@"
+	@$(C) $(CFLAGS) -c $< -o $@
 
-$(TESTS_DIR)/%.test: $(TESTS_OBJ_DIR)/%.test.o $(LF_OBJS) $(MS_OBJS_NO_MAIN)
+$(TEST_OBJ_DIR)/%.test.o: $(TEST_DIR)/%.test.c
+	@mkdir -p $(dir $@)
+#	@echo "Compiling $< → $@"
+	@$(C) $(CFLAGS) -c $< -o $@
+
+$(TEST_DIR)/%.test: $(TEST_OBJ_DIR)/%.test.o $(LF_OBJS) $(MS_OBJS_NO_MAIN) $(TEST_UTILS_OBJ)
+	@echo "Create executable $@"
 	@$(CC) $(CFLAGS) $^ -o $@
 # ===================================================
-test: all $(TESTS_EXEC)
-	@printf "$(YELLOW)Execute tests:$(NC)\n-------------------------------\n"
-	@for t in $(TESTS_EXEC); do \
-		echo "Running $$t..."; \
+test: all $(TEST_EXEC)
+	@printf "$(CYAN)\n-------------------------------\n\
+	$(YELLOW)	Execute tests:\
+	$(CYAN)\n-------------------------------\n"
+	@for t in $(TEST_EXEC); do \
+		echo "💭 $(YELLOW) Running $$t..."; \
 		if ./$$t; then \
-			echo "$(GREEN)✅ $$t passed$(NC)"; \
-		else \
-			echo "$(RED)❌ $$t failed$(NC)"; \
-		echo "-------------------------------"; \
+		echo "$(CYAN)-------------------------------"; \
 		fi \
 	done
 # ===================================================
@@ -119,9 +129,9 @@ clean:
 
 # ===================================================
 fclean: clean
-	@printf "$(RED)Cleaning all (including $(NAME) $(TESTS_EXEC))...$(NC)\n"
+	@printf "$(RED)Cleaning all (including $(NAME) $(TEST_EXEC))...$(NC)\n"
 	@rm -f $(NAME) 2>/dev/null
-	@rm -f $(TESTS_EXEC) 2>/dev/null
+	@rm -f $(TEST_EXEC) 2>/dev/null
 	@$(MAKE) -C $(LIBFT_DIR) fclean >/dev/null 2>&1
 	@sleep 0.1
 

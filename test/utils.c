@@ -1,24 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.test.c                                       :+:      :+:    :+:   */
+/*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/21 18:13:05 by pbride            #+#    #+#             */
-/*   Updated: 2025/10/21 20:26:21 by pbride           ###   ########.fr       */
+/*   Updated: 2025/10/23 18:47:58 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
+#include "minishell.h"
 
-int	main(void)
+void	assert_eq(int value, int expected, char *file, int line)
 {
-	int	i;
+	if (value != expected)
+		printf("❌%s%s:%d - %d != %d\n", RED, file, line, value, expected);
+	else
+		printf("✅%s%s:%d - %d == %d\n", GREEN, file, line, value, expected);
+}
 
-	i = 1;
-	if (i == 1)
-		return (0);
-	//printf("Je test line : %d, je test file : %s", __LINE__, __FILE__);
-	return (0);
+void	assert_str_eq(char *value, char *expected, char *file, int line)
+{
+	if (ft_strcmp(value, expected) != 0)
+		printf("❌%s%s:%d - %s != %s\n", RED, file, line, value, expected);
+	else
+		printf("✅%s%s:%d - %s == %s\n", GREEN, file, line, value, expected);
 }
