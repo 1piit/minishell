@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@42.fr>                  +#+  +:+       +#+        */
+/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/01 13:48:03 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/10/23 19:50:01 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,7 +137,7 @@ void	unset(char ***env, char **args);
 void	unset_var(char ***env, char *var);
 
 // === MINISHELL ===
-int		main(void);
+//int		main(int ac, char **av, char **envp);
 char	**init_env(char **envp);
 void	minishell_loop(char **envp);
 t_token	*tokenize(const char *line, t_lexer *lx);
@@ -151,5 +151,9 @@ int		is_operator_char(char c);
 int		tokenize_word(const char *line, int *i, t_lexer *lx);
 int		tokenize_quoted_word(const char *line, int *i, t_lexer *lx);
 t_token	*tokenize(const char *line, t_lexer *lx);
+
+// === TEST_UTILS ===
+void	assert_eq(int value, int expected, char *file, int line);
+void	assert_str_eq(char *value, char *expected, char *file, int line);
 
 #endif
