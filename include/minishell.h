@@ -92,6 +92,16 @@ typedef struct s_token
 	struct s_token	*next;
 }	t_token;
 
+typedef struct s_lexer
+{
+	t_token	*head;
+	t_token	*last;
+	char	word[4096];
+	int		j;
+	char	quote;
+}	t_lexer;
+
+
 typedef struct s_exec
 {
 	int	pid;
@@ -127,7 +137,19 @@ void	unset(char ***env, char **args);
 void	unset_var(char ***env, char *var);
 
 // === MINISHELL ===
-int		main(int ac, char **av, char **envp);
+int		main(void);
 char	**init_env(char **envp);
+void	minishell_loop(char **envp);
+t_token	*tokenize(const char *line, t_lexer *lx);
+char	*token_type_to_str(t_tokentype type);
+
+// TOKENISATION
+void	skip_spaces(const char *line, int *i);
+int		handle_operator(const char *line, int i, t_lexer *lx);
+t_token	*add_token(t_lexer *lx, t_tokentype type, char *word);
+int		is_operator_char(char c);
+int		tokenize_word(const char *line, int *i, t_lexer *lx);
+int		tokenize_quoted_word(const char *line, int *i, t_lexer *lx);
+t_token	*tokenize(const char *line, t_lexer *lx);
 
 #endif
