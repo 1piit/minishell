@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/23 19:50:01 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/10/24 15:03:58 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,7 @@ typedef enum e_tokentype
 typedef struct s_token
 {
 	t_tokentype		type;
+	int				is_special;
 	char			*word;
 	struct s_token	*next;
 }	t_token;
@@ -143,7 +144,7 @@ void	minishell_loop(char **envp);
 t_token	*tokenize(const char *line, t_lexer *lx);
 char	*token_type_to_str(t_tokentype type);
 
-// TOKENISATION
+// === TOKENISATION ===
 void	skip_spaces(const char *line, int *i);
 int		handle_operator(const char *line, int i, t_lexer *lx);
 t_token	*add_token(t_lexer *lx, t_tokentype type, char *word);
@@ -151,6 +152,9 @@ int		is_operator_char(char c);
 int		tokenize_word(const char *line, int *i, t_lexer *lx);
 int		tokenize_quoted_word(const char *line, int *i, t_lexer *lx);
 t_token	*tokenize(const char *line, t_lexer *lx);
+
+// === PARSER ===
+int		parser(t_lexer *lx);
 
 // === TEST_UTILS ===
 void	assert_eq(int value, int expected, char *file, int line);

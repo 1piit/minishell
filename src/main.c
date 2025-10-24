@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   test.c                                             :+:      :+:    :+:   */
+/*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@42.fr>                  +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/28 15:21:11 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/09/28 15:21:13 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/10/24 14:53:46 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,8 +15,9 @@
 // Fonction pour afficher la liste de tokens
 void	print_tokens(t_token *head)
 {
-	t_token *tmp = head;
+	t_token	*tmp;
 
+	tmp = head;
 	while (tmp)
 	{
 		printf("Type: %s, Word: [%s]\n",
@@ -29,8 +30,8 @@ void	print_tokens(t_token *head)
 int	main(void)
 {
 	t_lexer	lx;
-	char *line;
-	t_token *tokens;
+	char	*line;
+	t_token	*tokens;
 
 	lx.head = NULL;
 	lx.last = NULL;
@@ -40,7 +41,8 @@ int	main(void)
 	tokens = tokenize(line, &lx);
 	if (!tokens)
 		return (printf("Erreur de tokenization\n"), 1);
-	print_tokens(tokens);
+	parser(&lx);
+	//print_tokens(tokens);
 
 	return (0);
 }
