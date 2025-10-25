@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   tokenisation.c                                     :+:      :+:    :+:   */
+/*   tokenisation_utils.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@42.fr>                  +#+  +:+       +#+        */
+/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 12:34:45 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/23 12:34:46 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/10/25 18:19:50 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,15 +62,24 @@ void	skip_spaces(const char *line, int *i)
 		(*i)++;
 }
 
-int	tokenize_word(const char *line, int *i, t_lexer *lx)
+int	tokenize_word(const char *line, int *i, t_lexer *lx, char **env)
 {
-	int		start;
+	char	*part;
 	char	*word;
+	char	*temp;
 
-	start = *i;
+	word = ft_strdup("");
 	while (line[*i] && line[*i] != ' ' && !is_operator_char(line[*i]))
-		(*i)++;
-	word = ft_substr(line, start, *i - start);
+	{
+		if (line[*i] == '\'' || line[*i] == '\"')
+			part = extract_quoted_part(line, i, env);
+		else
+			part = extract_unquoted_part(line, i, env);
+		temp = ft_strjoin(word, part);
+		free(word);
+		free(part);
+		word = temp;
+	}
 	add_token(lx, T_WORD, word);
 	free(word);
 	return (0);
