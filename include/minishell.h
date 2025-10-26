@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/24 15:03:58 by pbride           ###   ########.fr       */
+/*   Updated: 2025/10/26 23:37:46 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ typedef enum e_tokentype
 typedef struct s_token
 {
 	t_tokentype		type;
-	int				is_special;
+	int				is_operator;
 	char			*word;
 	struct s_token	*next;
 }	t_token;

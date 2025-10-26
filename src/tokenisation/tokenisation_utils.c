@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 12:34:45 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/24 15:09:00 by pbride           ###   ########.fr       */
+/*   Updated: 2025/10/26 23:42:47 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,7 @@ t_token	*add_token(t_lexer *lx, t_tokentype type, char *word)
 		return (NULL);
 	new->type = type;
 	new->word = NULL;
-	new->is_special = 0;
-	if (type != T_WORD && type != T_HEREDOC)
-		new->is_special = 1;
+	new->is_operator = (type != T_WORD);
 	if (word)
 	{
 		new->word = ft_strdup(word);

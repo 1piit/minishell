@@ -6,39 +6,46 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 19:20:39 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/24 15:23:48 by pbride           ###   ########.fr       */
+/*   Updated: 2025/10/26 23:44:26 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	parser(t_lexer *lx)
+void	check_consecutive_operators(t_token *line)
 {
-	t_token	*line;
-	t_token	*tmp_special;
+	t_token	*tmp_operator;
 	int		special_count;
 
-	line = lx->head;
-	tmp_special = NULL;
+	tmp_operator = NULL;
 	special_count = 0;
-	while (line && !tmp_special)
+
+	while (line && !tmp_operator)
 	{
-		if (line->is_special)
-			tmp_special = line;
-		printf("line->type=%d, line->is_special=%d line->word=%s\n",
-			line->type, line->is_special, line->word);
+		if (line->is_operator)
+			tmp_operator = line;
 		line = line->next;
 	}
-	while (tmp_special && tmp_special->is_special)
+	while (tmp_operator && tmp_operator->is_operator)
 	{
 		special_count++;
-		tmp_special = tmp_special->next;
+		tmp_operator = tmp_operator->next;
 	}
 	if (special_count > 1)
 		printf("Pasre error\n");
+	//TODO
+	//Add exit/perror/free
+}
+
+int	parser(t_lexer *lx)
+{
+	t_token	*line;
+
+	line = lx->head;
+	while (line)
+	{
+		check_consecutive_operators(line);
+		line = line->next;
+	}
 	return (0);
-	//if (line->type == T_APPEND && line->typ == T_REDIR_OUT)
-	//	perror("Parsing error");
-	//if (lx->last == NULL && lx->head->type == T_APPEND)
-	//	perror();
 }
