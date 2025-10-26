@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/26 23:37:46 by pbride           ###   ########.fr       */
+/*   Updated: 2025/10/26 23:51:27 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -154,6 +154,7 @@ int		tokenize_quoted_word(const char *line, int *i, t_lexer *lx);
 t_token	*tokenize(const char *line, t_lexer *lx);
 
 // === PARSER ===
+void	check_consecutive_operators(t_token *line);
 int		parser(t_lexer *lx);
 
 // === TEST_UTILS ===
