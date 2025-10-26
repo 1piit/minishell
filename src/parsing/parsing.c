@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 19:20:39 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/26 23:54:55 by pbride           ###   ########.fr       */
+/*   Updated: 2025/10/26 23:57:46 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void	check_consecutive_operators(t_token *line)
 			tmp_operator = line;
 		line = line->next;
 	}
-	while (tmp_operator && tmp_operator->is_operator && operator_count <= 2)
+	while (tmp_operator && tmp_operator->is_operator && operator_count < 2)
 	{
 		operator_count++;
 		tmp_operator = tmp_operator->next;
