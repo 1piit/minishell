@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/25 18:37:27 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/10/26 15:37:09 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,6 +90,7 @@ typedef enum e_tokentype
 typedef struct s_token
 {
 	t_tokentype		type;
+	int				is_special;
 	char			*word;
 	struct s_token	*next;
 }	t_token;
@@ -150,12 +151,14 @@ int		handle_operator(const char *line, int i, t_lexer *lx);
 t_token	*add_token(t_lexer *lx, t_tokentype type, char *word);
 int		is_operator_char(char c);
 int		tokenize_word(const char *line, int *i, t_lexer *lx, char **env);
-int		tokenize_quoted_word(const char *line, int *i, t_lexer *lx);
 t_token	*tokenize(const char *line, t_lexer *lx, char **env);
 char	*extract_unquoted_part(const char *line, int *i, char **env);
 char	*extract_quoted_part(const char *line, int *i, char **env);
 char	*expand_vars(const char *str, char **env, int expand);
 int		copy_var_value(char *dst, const char *src, int *i, char **env);
+
+// PARSER
+int		parser(t_lexer *lx);
 
 // === TEST_UTILS ===
 void	assert_eq(int value, int expected, char *file, int line);

@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:59:20 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/25 18:37:13 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/10/26 19:24:29 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,17 +18,22 @@ char	*extract_quoted_part(const char *line, int *i, char **env)
 	char	*part;
 	char	*expanded;
 	int		start;
+	int		len;
 
 	quote = line[*i];
 	(*i)++;
 	start = *i;
 	while (line[*i] && line[*i] != quote)
 		(*i)++;
-	part = ft_substr(line, start, *i - start);
+	len = *i - start;
+	if (len < 0)
+		len = 0;
+	part = ft_substr(line, start, len);
 	if (line[*i] == quote)
 		(*i)++;
 	if (quote == '"')
 	{
+		//printf("DEBUG: found double quote\n");
 		expanded = expand_vars(part, env, 1);
 		free(part);
 		return (expanded);
@@ -53,31 +58,6 @@ char	*extract_unquoted_part(const char *line, int *i, char **env)
 	return (expanded);
 }
 
-int	tokenize_quoted_word(const char *line, int *i, t_lexer *lx)
-{
-	int		start;
-	char	quote;
-	char	*word;
-
-	quote = line[*i];
-	(*i)++;
-	start = *i;
-	while (line[*i])
-	{
-		if (line[*i] == quote)
-			break ;
-		(*i)++;
-	}
-	if (!line[*i])
-		return (fprintf(stderr, "Error: unclosed quote\n"), -1);
-	word = ft_substr(line, start, *i - start);
-	add_token(lx, T_WORD, word);
-	free(word);
-	if (line[*i] == quote)
-		(*i)++;
-	return (0);
-}
-
 t_token	*tokenize(const char *line, t_lexer *lx, char **env)
 {
 	int		i;
@@ -95,10 +75,7 @@ t_token	*tokenize(const char *line, t_lexer *lx, char **env)
 			i += op_len;
 			continue ;
 		}
-		if (line[i] == '\'' || line[i] == '\"')
-			tokenize_quoted_word(line, &i, lx);
-		else
-			tokenize_word(line, &i, lx, env);
+		tokenize_word(line, &i, lx, env);
 	}
 	return (lx->head);
 }

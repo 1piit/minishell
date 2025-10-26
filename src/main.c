@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/28 15:21:11 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/25 18:27:49 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/10/26 19:26:14 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	print_tokens(t_token *head)
 
 	while (tmp)
 	{
-		printf("Type: %s, Word: [%s]\n",
+		printf(RED "Type: %s, Word: [%s]\n\n" NC,
 			token_type_to_str(tmp->type), tmp->word ? tmp->word : "(null)");
 		tmp = tmp->next;
 	}
@@ -69,6 +69,7 @@ int main(int argc, char **argv, char **envp)
 			continue ;
 		}
 		print_tokens(tokens);
+		parser(&lx);
 		free(line);
 	}
 	return (0);
