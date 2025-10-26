@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 19:20:39 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/26 23:44:26 by pbride           ###   ########.fr       */
+/*   Updated: 2025/10/26 23:50:27 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,10 @@
 void	check_consecutive_operators(t_token *line)
 {
 	t_token	*tmp_operator;
-	int		special_count;
+	int		operator_count;
 
 	tmp_operator = NULL;
-	special_count = 0;
+	operator_count = 0;
 
 	while (line && !tmp_operator)
 	{
@@ -28,10 +28,10 @@ void	check_consecutive_operators(t_token *line)
 	}
 	while (tmp_operator && tmp_operator->is_operator)
 	{
-		special_count++;
+		operator_count++;
 		tmp_operator = tmp_operator->next;
 	}
-	if (special_count > 1)
+	if (operator_count > 1)
 		printf("Pasre error\n");
 	//TODO
 	//Add exit/perror/free
