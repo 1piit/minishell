@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/10/27 12:31:30 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/10/27 12:47:08 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,8 +73,11 @@ int main(int argc, char **argv, char **envp)
 			free(line);
 			continue ;
 		}
+		printf("=====TOKENISATION=====\n");
 		print_tokens(tokens);
+		printf("=====PARSING=====\n");
 		parser(&lx);
+		printf("=====EXEC=====\n");
 		free(line);
 	}
 	return (0);

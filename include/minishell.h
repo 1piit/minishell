@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/27 12:32:00 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/10/27 12:35:36 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ typedef enum e_tokentype
 typedef struct s_token
 {
 	t_tokentype		type;
-	int				is_special;
+	int				is_operator;
 	char			*word;
 	struct s_token	*next;
 }	t_token;

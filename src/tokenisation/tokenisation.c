@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:59:20 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/26 19:24:29 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/10/27 12:36:27 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@ char	*extract_quoted_part(const char *line, int *i, char **env)
 		(*i)++;
 	if (quote == '"')
 	{
-		//printf("DEBUG: found double quote\n");
 		expanded = expand_vars(part, env, 1);
 		free(part);
 		return (expanded);
