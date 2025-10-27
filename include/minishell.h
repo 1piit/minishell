@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/26 15:37:09 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/10/27 12:32:00 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,7 +145,7 @@ char	**init_env(char **envp);
 void	minishell_loop(char **envp);
 char	*token_type_to_str(t_tokentype type);
 
-// TOKENISATION
+// === TOKENISATION ===
 void	skip_spaces(const char *line, int *i);
 int		handle_operator(const char *line, int i, t_lexer *lx);
 t_token	*add_token(t_lexer *lx, t_tokentype type, char *word);

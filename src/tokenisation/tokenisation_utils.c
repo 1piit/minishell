@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 12:34:45 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/26 15:42:35 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/10/27 12:29:17 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ t_token	*add_token(t_lexer *lx, t_tokentype type, char *word)
 		return (NULL);
 	new->type = type;
 	new->word = NULL;
-	new->is_special = (type != T_WORD);
+	new->is_operator = (type != T_WORD);
 	if (word)
 	{
 		new->word = ft_strdup(word);

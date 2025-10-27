@@ -5,10 +5,14 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/28 15:21:11 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/26 19:26:14 by rgalmich         ###   ########.fr       */
+/*   Created: Invalid date        by                   #+#    #+#             */
+/*   Updated: 2025/10/27 12:31:30 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+
+
+
 
 #include "minishell.h"
 
@@ -23,8 +27,9 @@ else
 
 void	print_tokens(t_token *head)
 {
-	t_token *tmp = head;
+	t_token	*tmp;
 
+	tmp = head;
 	while (tmp)
 	{
 		printf(RED "Type: %s, Word: [%s]\n\n" NC,
