@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tokenisation_utils.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 12:34:45 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/26 23:42:47 by pbride           ###   ########.fr       */
+/*   Updated: 2025/10/27 14:52:14 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ t_token	*add_token(t_lexer *lx, t_tokentype type, char *word)
 	new->type = type;
 	new->word = NULL;
 	new->is_operator = (type != T_WORD);
-	if (word)
+	if (word && new)
 	{
 		new->word = ft_strdup(word);
 		if (!new->word)
@@ -63,15 +63,26 @@ void	skip_spaces(const char *line, int *i)
 		(*i)++;
 }
 
-int	tokenize_word(const char *line, int *i, t_lexer *lx)
+int	tokenize_word(const char *line, int *i, t_lexer *lx, char **env)
 {
-	int		start;
+	char	*part;
 	char	*word;
+	char	*temp;
 
-	start = *i;
+	word = ft_strdup("");
 	while (line[*i] && line[*i] != ' ' && !is_operator_char(line[*i]))
-		(*i)++;
-	word = ft_substr(line, start, *i - start);
+	{
+		if (line[*i] == '\'' || line[*i] == '\"')
+			part = extract_quoted_part(line, i, env);
+		else
+			part = extract_unquoted_part(line, i, env);
+		if (!part)
+			return (free(word), 1);
+		temp = ft_strjoin(word, part);
+		free(word);
+		free(part);
+		word = temp;
+	}
 	add_token(lx, T_WORD, word);
 	free(word);
 	return (0);

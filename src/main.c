@@ -3,16 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/28 15:21:11 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/24 14:53:46 by pbride           ###   ########.fr       */
+/*   Created: Invalid date        by                   #+#    #+#             */
+/*   Updated: 2025/10/28 16:11:58 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+int	g_exit_status = 0;
+/*
+if (exec_failed)
+	g_exit_status = 127;
+else
+	g_exit_status = WEXITSTATUS(status);
+*/
 // Fonction pour afficher la liste de tokens
+
 void	print_tokens(t_token *head)
 {
 	t_token	*tmp;
@@ -20,29 +28,60 @@ void	print_tokens(t_token *head)
 	tmp = head;
 	while (tmp)
 	{
-		printf("Type: %s, Word: [%s]\n",
+		printf(RED "Type: %s, Word: [%s]\n\n" NC,
 			token_type_to_str(tmp->type), tmp->word ? tmp->word : "(null)");
 		tmp = tmp->next;
 	}
 }
 
 // Exemple d’utilisation
-int	main(void)
+#include <stdio.h>
+#include <readline/readline.h>
+#include <readline/history.h>
+
+int main(int argc, char **argv, char **envp)
 {
-	t_lexer	lx;
-	char	*line;
-	t_token	*tokens;
+    (void)argc;
+	(void)argv;
 
-	lx.head = NULL;
-	lx.last = NULL;
-	line = readline("minishell $ ");
-	if (!line)
-		return (perror("Error: "), 1);
-	tokens = tokenize(line, &lx);
-	if (!tokens)
-		return (printf("Erreur de tokenization\n"), 1);
-	parser(&lx);
-	//print_tokens(tokens);
+    t_lexer lx;
+    char *line;
+    t_token *tokens;
+    char **env;
 
+	env = init_env(envp);
+	while (1)
+	{
+		if (!env)
+			break ;
+		lx.head = NULL;
+		lx.last = NULL;
+		line = readline("minishell $ ");
+		if (!line)
+		{
+			printf("\n");
+			break ;
+		}
+		if (*line)
+			add_history(line);
+		tokens = tokenize(line, &lx, env);
+		if (!tokens)
+		{
+			printf("Erreur de tokenization\n");
+			free(line);
+			continue ;
+		}
+		printf("=====TOKENISATION=====\n");
+		print_tokens(tokens);
+		printf("=====PARSING=====\n");
+		parser(&lx);
+		printf("=====EXEC=====\n");
+		free(line);
+		for (int p = 0; env[p]; p++)
+			free(env[p]);
+		free(env);
+		exit(1);
+	}
 	return (0);
 }
+

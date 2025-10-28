@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/26 23:51:27 by pbride           ###   ########.fr       */
+/*   Updated: 2025/10/27 13:54:14 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,8 @@
 # define PURPLE_LIGHT	"\001\033[1;35m\002"
 # define WHITE			"\001\033[1;37m\002"
 # define BLACK			"\001\033[30;47m\002"
+
+extern int	g_exit_status;
 
 typedef struct s_env
 {
@@ -138,10 +140,9 @@ void	unset(char ***env, char **args);
 void	unset_var(char ***env, char *var);
 
 // === MINISHELL ===
-//int		main(int ac, char **av, char **envp);
+int		main(int ac, char **av, char **envp);
 char	**init_env(char **envp);
 void	minishell_loop(char **envp);
-t_token	*tokenize(const char *line, t_lexer *lx);
 char	*token_type_to_str(t_tokentype type);
 
 // === TOKENISATION ===
@@ -149,12 +150,14 @@ void	skip_spaces(const char *line, int *i);
 int		handle_operator(const char *line, int i, t_lexer *lx);
 t_token	*add_token(t_lexer *lx, t_tokentype type, char *word);
 int		is_operator_char(char c);
-int		tokenize_word(const char *line, int *i, t_lexer *lx);
-int		tokenize_quoted_word(const char *line, int *i, t_lexer *lx);
-t_token	*tokenize(const char *line, t_lexer *lx);
+int		tokenize_word(const char *line, int *i, t_lexer *lx, char **env);
+t_token	*tokenize(const char *line, t_lexer *lx, char **env);
+char	*extract_unquoted_part(const char *line, int *i, char **env);
+char	*extract_quoted_part(const char *line, int *i, char **env);
+char	*expand_vars(const char *str, char **env, int expand);
+int		copy_var_value(char *dst, const char *src, int *i, char **env);
 
-// === PARSER ===
-void	check_consecutive_operators(t_token *line);
+// PARSER
 int		parser(t_lexer *lx);
 
 // === TEST_UTILS ===
