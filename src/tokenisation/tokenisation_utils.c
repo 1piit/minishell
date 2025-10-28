@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 12:34:45 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/27 12:29:17 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/10/27 14:52:14 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ t_token	*add_token(t_lexer *lx, t_tokentype type, char *word)
 	new->type = type;
 	new->word = NULL;
 	new->is_operator = (type != T_WORD);
-	if (word)
+	if (word && new)
 	{
 		new->word = ft_strdup(word);
 		if (!new->word)
@@ -76,6 +76,8 @@ int	tokenize_word(const char *line, int *i, t_lexer *lx, char **env)
 			part = extract_quoted_part(line, i, env);
 		else
 			part = extract_unquoted_part(line, i, env);
+		if (!part)
+			return (free(word), 1);
 		temp = ft_strjoin(word, part);
 		free(word);
 		free(part);

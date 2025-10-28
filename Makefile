@@ -28,7 +28,7 @@ MS_OBJS_NO_MAIN = $(filter-out $(MS_OBJ_DIR)/main.o, $(MS_OBJS))
 
 # === CC ===
 C = cc
-CFLAGS = -Wall -Wextra -Werror -Iinclude -I$(LIBFT_DIR)
+CFLAGS = -Wall -Wextra -Werror -g3 -Iinclude -I$(LIBFT_DIR)
 LDFLAGS = -lreadline
 
 # === LIBFT ===

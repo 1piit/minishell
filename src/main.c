@@ -6,13 +6,9 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/10/27 12:47:08 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/10/28 16:11:58 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-
-
-
 
 #include "minishell.h"
 
@@ -46,7 +42,7 @@ void	print_tokens(t_token *head)
 int main(int argc, char **argv, char **envp)
 {
     (void)argc;
-    (void)argv;
+	(void)argv;
 
     t_lexer lx;
     char *line;
@@ -56,6 +52,8 @@ int main(int argc, char **argv, char **envp)
 	env = init_env(envp);
 	while (1)
 	{
+		if (!env)
+			break ;
 		lx.head = NULL;
 		lx.last = NULL;
 		line = readline("minishell $ ");
@@ -79,6 +77,10 @@ int main(int argc, char **argv, char **envp)
 		parser(&lx);
 		printf("=====EXEC=====\n");
 		free(line);
+		for (int p = 0; env[p]; p++)
+			free(env[p]);
+		free(env);
+		exit(1);
 	}
 	return (0);
 }

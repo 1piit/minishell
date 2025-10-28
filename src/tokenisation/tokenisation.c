@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 13:59:20 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/27 12:36:27 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/10/27 13:48:43 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,17 +18,17 @@ char	*extract_quoted_part(const char *line, int *i, char **env)
 	char	*part;
 	char	*expanded;
 	int		start;
-	int		len;
 
 	quote = line[*i];
 	(*i)++;
 	start = *i;
 	while (line[*i] && line[*i] != quote)
 		(*i)++;
-	len = *i - start;
-	if (len < 0)
-		len = 0;
-	part = ft_substr(line, start, len);
+	if (!line[*i])
+		return (fprintf(stderr, "syntax error: unclosed quote\n"), NULL);
+	part = ft_substr(line, start, *i - start);
+	if (!part)
+		return (NULL);
 	if (line[*i] == quote)
 		(*i)++;
 	if (quote == '"')
@@ -52,6 +52,8 @@ char	*extract_unquoted_part(const char *line, int *i, char **env)
 		&& line[*i] != '\'' && line [*i] != '\"')
 		(*i)++;
 	raw = ft_substr(line, start, *i - start);
+	if (!raw)
+		return (NULL);
 	expanded = expand_vars(raw, env, 1);
 	free(raw);
 	return (expanded);

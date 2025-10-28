@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 19:20:39 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/27 12:39:34 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/10/27 14:40:02 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,9 @@ int	parser(t_lexer *lx)
 	{
 		check_consecutive_operators(line);
 		line = line->next;
+		// printf(RED "line->" GREEN "type=%d" RED ", line->" GREEN
+		// 	"is_operator=%d" RED " line->" GREEN "word=%s\n\n"NC"",
+		// 	line->type, line->is_operator, line->word);
 	}
 	return (0);
 }
@@ -61,7 +64,7 @@ int	parser(t_lexer *lx)
 	while (line)
 	{
 		printf(RED "line->" GREEN "type=%d" RED ", line->" GREEN
-			"is_operator=%d" RED " line->" GREEN "word=%s\n\n" NC,
+			"is_operator=%d" RED " line->" GREEN "word=%s\n\n"NC"",
 			line->type, line->is_operator, line->word);
 		if (line->is_operator)
 		{
