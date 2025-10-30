@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 17:40:00 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/29 17:54:17 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/10/29 21:34:39 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@ t_cmd	*parse_command(t_token **current)
 	if (!cmd)
 		return (NULL);
 	cmd->argv = malloc(sizeof(char *) * 1024);
+	if (!cmd->argv)
+		return (free(cmd), NULL);
 	cmd->redir = NULL;
 	cmd->fd_in = STDIN_FILENO;
 	cmd->fd_out = STDOUT_FILENO;
