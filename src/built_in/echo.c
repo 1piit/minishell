@@ -6,12 +6,39 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/10 13:50:18 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/29 16:45:29 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/10/31 20:06:07 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+int	echo(char **av)
+{
+	int	i;
+	int	newline;
+
+	if (!av || !av[0])
+		return (1);
+	i = 1;
+	newline = 1;
+	if (av[i] && ft_strcmp(av[i], "-n") == 0)
+	{
+		newline = 0;
+		i++;
+	}
+	while (av[i])
+	{
+		printf("%s", av[i]);
+		if (av[i + 1])
+			printf(" ");
+		i++;
+	}
+	if (newline)
+		printf("\n");
+	return (0);
+}
+
+/*
 int	echo(char **av, char **alloc_env)
 {
 	int	i;
@@ -68,3 +95,4 @@ void	echo_print_env(char **av, int i, char **alloc_env)
 		i++;
 	}
 }
+*/

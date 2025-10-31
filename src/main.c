@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:39:17 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/29 22:05:15 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/10/31 22:02:33 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,87 +24,17 @@ void	lexer_init(t_lexer *lx)
 	lx->cmds = NULL;
 }
 
-static void	process_line(t_lexer *lx, char *line, char **env)
+static void	process_line(t_lexer *lx, char *line, char ***env)
 {
 	t_cmd	*cmds;
 
 	lexer_init(lx);
-	tokenize(line, lx, env);
+	tokenize(line, lx, *env);
 	cmds = parser(lx);
-	if (cmds)
-		execute_cmds(cmds);
-}
-
-void	execute_command(t_cmd *cmd)
-{
-	pid_t	pid;
-	int		status;
-
-	pid = fork();
-	if (pid == 0)
+	while (cmds)
 	{
-		setup_redirections(cmd);
-		if (execvp(cmd->argv[0], cmd->argv) == -1)
-		{
-			fprintf(stderr, "Minishell: command not found: "
-				"%s\n", cmd->argv[0]);
-			exit(1);
-		}
-	}
-	else if (pid > 0)
-	{
-		waitpid(pid, &status, 0);
-		g_exit_status = WEXITSTATUS(status);
-	}
-	else
-		perror("fork");
-}
-
-// static void	command_slash_exec(t_cmd *cmd, char **env)
-// {
-// 	execve(cmd->argv[0], cmd->argv, env);
-// 	fprintf(stderr, "Minishell: %s: %s\n",
-// 		cmd->argv[0], strerror(errno));
-// 	exit(127);
-// }
-
-// void	execute_command(t_cmd *cmd, char **env)
-// {
-// 	pid_t	pid;
-// 	int		status;
-
-// 	pid = fork();
-// 	if (pid == 0)
-// 	{
-// 		setup_redirections(cmd);
-// 		if (strchr(cmd->argv[0], '/'))
-// 			command_slash_exec(cmd->argv[0], env);
-// 		else
-// 		{
-// 			execvp(cmd->argv[0], cmd->argv);
-// 			fprintf(stderr, "Minishell: command not found: %s\n",
-// 				cmd->argv[0]);
-// 			exit(127);
-// 		}
-// 	}
-// 	else if (pid > 0)
-// 	{
-// 		waitpid(pid, &status, 0);
-// 		g_exit_status = WEXITSTATUS(status);
-// 	}
-// 	else
-// 		perror("fork");
-// }
-
-void	execute_cmds(t_cmd *cmds)
-{
-	t_cmd	*cur;
-
-	cur = cmds;
-	while (cur)
-	{
-		execute_command(cur);
-		cur = cur->next;
+		execute_cmds(cmds, env);
+		cmds = cmds->next;
 	}
 }
 
@@ -122,12 +52,8 @@ int	main(int argc, char **argv, char **envp)
 	g_exit_status = 0;
 	while (1)
 	{
-		line = readline("minishell $ ");
-		if (!line)
-			break ;
-		if (*line)
-			add_history(line);
-		process_line(&lx, line, env);
+		line = get_input("minishell $ ");
+		process_line(&lx, line, &env);
 		free(line);
 	}
 	printf("exit\n");

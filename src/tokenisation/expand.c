@@ -38,6 +38,22 @@ char	*expand_vars(const char *str, char **env, int expand)
 	return (ft_strdup(buf));
 }
 
+char	*get_env_value(char **env, const char *var)
+{
+	int		i;
+	size_t	len;
+
+	len = ft_strlen(var);
+	i = 0;
+	while (env[i])
+	{
+		if (ft_strncmp(env[i], var, len) == 0 && env[i][len] == '=')
+			return (env[i] + len + 1);
+		i++;
+	}
+	return ("");
+}
+
 int	copy_var_value(char *dst, const char *src, int *i, char **env)
 {
 	char	name[256];

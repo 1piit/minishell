@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/10 17:18:46 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/29 17:07:02 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/10/31 21:46:25 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,35 +18,33 @@ static void	unset_var2(char **env, char *var, char **new_env)
 	int		j;
 	size_t	len;
 
+	len = ft_strlen(var);
 	i = 0;
 	j = 0;
-	len = ft_strlen(var);
 	while (env[i])
 	{
 		if (!(ft_strncmp(env[i], var, len) == 0 && env[i][len] == '='))
 		{
 			new_env[j] = ft_strdup(env[i]);
-			free(env[i]);
 			j++;
 		}
-		else
-			free(env[i]);
+		free(env[i]);
 		i++;
 	}
 	new_env[j] = NULL;
 }
 
-void	unset_var(char ***env, char *var)
+static void	unset_var(char ***env, char *var)
 {
 	int		count;
 	char	**new_env;
 
-	count = 0;
 	if (!env || !*env || !var)
 		return ;
+	count = 0;
 	while ((*env)[count])
 		count++;
-	new_env = malloc(sizeof(char *) * count);
+	new_env = malloc(sizeof(char *) * (count + 1));
 	if (!new_env)
 		return ;
 	unset_var2(*env, var, new_env);
@@ -54,16 +52,17 @@ void	unset_var(char ***env, char *var)
 	*env = new_env;
 }
 
-void	unset(char ***env, char **args)
+int	unset(char ***env, char **args)
 {
 	int	i;
 
+	if (!env || !args)
+		return (1);
 	i = 0;
-	if (!args || !env)
-		return ;
 	while (args[i])
 	{
 		unset_var(env, args[i]);
 		i++;
 	}
+	return (0);
 }

@@ -1,31 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   env.c                                              :+:      :+:    :+:   */
+/*   exit.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: rgalmich <rgalmich@42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/29 16:53:40 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/29 16:53:41 by rgalmich         ###   ########.fr       */
+/*   Created: 2025/10/31 20:01:42 by rgalmich          #+#    #+#             */
+/*   Updated: 2025/10/31 20:05:27 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include <minishell.h>
 
-int	my_env(char **envp)
+int	my_exit(char **argv)
 {
-	int	i;
+	int	status;
 
-	if (!envp)
-	{
-		fprintf(stderr, "env: no environment found\n");
-		return (1);
-	}
-	i = 0;
-	while (envp[i])
-	{
-		printf(WHITE "%s\n" NC, envp[i]);
-		i++;
-	}
-	return (0);
+	status = g_exit_status;
+	if (argv[1])
+		status = ft_atoi(argv[1]);
+	printf("exit\n");
+	exit(status);
 }

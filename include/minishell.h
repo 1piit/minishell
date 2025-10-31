@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/29 20:06:45 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/10/31 21:33:14 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,20 +129,22 @@ typedef struct s_heredoc
 }	t_heredoc;
 
 // === BUILT-IN ===
-int		cd(char *path);
+int		cd(char *path, char ***env);
 int		pwd(void);
-int		env(char **envp);
-int		echo(char **av, char **alloc_env);
-void	echo_print_env(char **av, int i, char **alloc_env);
-void	export_no_args(char **env);
+int		my_env(char **envp);
+int		echo(char **av);
+int		my_export(char **args, char ***env);
 char	*get_env_value(char **env, const char *var);
-void	add_or_update_env(char ***env, char *var);
-void	unset(char ***env, char **args);
-void	unset_var(char ***env, char *var);
+void	add_or_update_env(char ***env, const char *var_value);
+int		unset(char ***env, char **args);
+int		is_builtin(char *cmd);
+int		exec_builtin(t_cmd *cmd, char ***env);
+int		my_exit(char **argv);
 
 // === MINISHELL ===
 int		main(int ac, char **av, char **envp);
 char	**init_env(char **envp);
+char	*get_input(const char *prompt);
 char	*token_type_to_str(t_tokentype type);
 
 // === TOKENISATION ===
@@ -173,8 +175,7 @@ void	setup_redirections(t_cmd *cmd);
 t_cmd	*parse_command(t_token **current);
 
 // === EXECUTION ===
-void	execute_command(t_cmd *cmd);
-void	execute_cmds(t_cmd *cmds);
+void	execute_cmds(t_cmd *cmds, char ***env);
 void	redir_apply_in(t_redir *r);
 void	redir_apply_out(t_redir *r);
 
