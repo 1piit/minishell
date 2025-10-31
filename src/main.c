@@ -129,10 +129,6 @@ int	main(int argc, char **argv, char **envp)
 			add_history(line);
 		process_line(&lx, line, env);
 		free(line);
-		for (int j = 0; env[j]; j++)
-			free(env[j]);
-		free(env);
-		exit(0);
 	}
 	printf("exit\n");
 	return (g_exit_status);

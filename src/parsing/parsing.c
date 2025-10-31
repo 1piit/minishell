@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 19:20:39 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/29 18:02:16 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/10/31 09:51:01 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@ static int	count_specials(t_token *line, t_token **last)
 
 	tmp = line;
 	count = 0;
-	while (tmp && tmp->is_operator)
+	while (tmp && tmp->is_operator && count < 2)
 	{
 		count++;
 		tmp = tmp->next;
