@@ -1,0 +1,46 @@
+echo salut
+ls -l /tmp
+/bin/echo hello
+echo 'bonjour'
+echo "bonjour"
+echo 'salut le monde'
+echo "salut le monde"
+echo "a'b'c"
+echo ''
+echo ""
+echo $USER
+echo "$USER"
+echo '$USER'
+echo $HOME/Documents
+echo $HOME/$USER
+echo $UNDEFINED
+echo $?
+echo $
+echo "$?"
+cat < infile
+echo salut > outfile
+echo salut >> log.txt
+cat < infile > outfile
+cat < infile | grep toto > result.txt
+echo salut >
+>
+<
+echo > outfile salut
+ls | wc
+echo test | grep t | wc -l
+| ls
+ls |
+cat < infile | grep a > out.txt
+echo "Salut $USER"
+echo '$USER' "$HOME"
+echo "$UNDEFINED$USER"
+echo "$HOME""/Desktop"
+echo "yo'bro"
+cat <<EOF
+echo 'a"b'c"
+""
+''
+echo
+     echo      salut   
+echo salut  |  grep s
+echo "unclosed

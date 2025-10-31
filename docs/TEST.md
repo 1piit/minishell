@@ -16,3 +16,10 @@ int	main(void)
 	return (0);
 }
 
+test qui ne passe pas:
+passe
+< > >>
+passe pas
+<< |
+cat <
+echo <<

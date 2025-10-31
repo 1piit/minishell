@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   echo.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@42.fr>                  +#+  +:+       +#+        */
+/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/10 13:50:18 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/10 13:50:19 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/10/29 16:45:29 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,8 @@
 
 int	echo(char **av, char **alloc_env)
 {
-	int		i;
-	int		newline;
+	int	i;
+	int	newline;
 
 	i = 1;
 	newline = 0;
@@ -29,7 +29,7 @@ int	echo(char **av, char **alloc_env)
 	echo_print_env(av, i, alloc_env);
 	if (!newline)
 		printf("\n");
-	else if (newline)
+	else
 		printf(BLACK "%%" NC "\n");
 	return (0);
 }

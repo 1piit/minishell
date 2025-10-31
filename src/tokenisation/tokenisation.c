@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/23 13:59:20 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/27 13:48:43 by rgalmich         ###   ########.fr       */
+/*   Created: 2025/10/29 16:54:10 by rgalmich          #+#    #+#             */
+/*   Updated: 2025/10/29 17:53:42 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ char	*extract_unquoted_part(const char *line, int *i, char **env)
 	start = *i;
 	while (line[*i] && line[*i] != ' '
 		&& !is_operator_char(line[*i])
-		&& line[*i] != '\'' && line [*i] != '\"')
+		&& line[*i] != '\'' && line[*i] != '"')
 		(*i)++;
 	raw = ft_substr(line, start, *i - start);
 	if (!raw)
@@ -61,8 +61,8 @@ char	*extract_unquoted_part(const char *line, int *i, char **env)
 
 t_token	*tokenize(const char *line, t_lexer *lx, char **env)
 {
-	int		i;
-	int		op_len;
+	int	i;
+	int	op_len;
 
 	i = 0;
 	while (line[i])
@@ -79,4 +79,25 @@ t_token	*tokenize(const char *line, t_lexer *lx, char **env)
 		tokenize_word(line, &i, lx, env);
 	}
 	return (lx->head);
+}
+
+int	tokenize_word(const char *line, int *i, t_lexer *lx, char **env)
+{
+	char	*part;
+	char	*word;
+
+	word = ft_strdup("");
+	while (line[*i] && line[*i] != ' ' && !is_operator_char(line[*i]))
+	{
+		if (get_part(line, i, &part, env) != 0)
+		{
+			free(word);
+			return (1);
+		}
+		if (append_part(&word, part) != 0)
+			return (1);
+	}
+	add_token(lx, T_WORD, word);
+	free(word);
+	return (0);
 }

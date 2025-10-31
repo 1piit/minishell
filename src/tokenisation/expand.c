@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/25 17:10:47 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/27 14:47:12 by rgalmich         ###   ########.fr       */
+/*   Created: 2025/10/29 16:54:05 by rgalmich          #+#    #+#             */
+/*   Updated: 2025/10/29 16:54:06 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ char	*expand_vars(const char *str, char **env, int expand)
 	{
 		if (str[i] == '$' && str[i + 1])
 		{
-			copied += copy_var_value(&buf[j], str, &i, env);
+			copied = copy_var_value(&buf[j], str, &i, env);
 			j += copied;
 		}
 		else

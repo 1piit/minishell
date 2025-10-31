@@ -5,83 +5,131 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/10/28 16:11:58 by rgalmich         ###   ########.fr       */
+/*   Created: 2025/10/29 16:39:17 by rgalmich          #+#    #+#             */
+/*   Updated: 2025/10/29 22:05:15 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 int	g_exit_status = 0;
-/*
-if (exec_failed)
-	g_exit_status = 127;
-else
-	g_exit_status = WEXITSTATUS(status);
-*/
-// Fonction pour afficher la liste de tokens
 
-void	print_tokens(t_token *head)
+void	lexer_init(t_lexer *lx)
 {
-	t_token	*tmp;
+	lx->head = NULL;
+	lx->last = NULL;
+	lx->j = 0;
+	lx->word[0] = '\0';
+	lx->quote = 0;
+	lx->cmds = NULL;
+}
 
-	tmp = head;
-	while (tmp)
+static void	process_line(t_lexer *lx, char *line, char **env)
+{
+	t_cmd	*cmds;
+
+	lexer_init(lx);
+	tokenize(line, lx, env);
+	cmds = parser(lx);
+	if (cmds)
+		execute_cmds(cmds);
+}
+
+void	execute_command(t_cmd *cmd)
+{
+	pid_t	pid;
+	int		status;
+
+	pid = fork();
+	if (pid == 0)
 	{
-		printf(RED "Type: %s, Word: [%s]\n\n" NC,
-			token_type_to_str(tmp->type), tmp->word ? tmp->word : "(null)");
-		tmp = tmp->next;
+		setup_redirections(cmd);
+		if (execvp(cmd->argv[0], cmd->argv) == -1)
+		{
+			fprintf(stderr, "Minishell: command not found: "
+				"%s\n", cmd->argv[0]);
+			exit(1);
+		}
+	}
+	else if (pid > 0)
+	{
+		waitpid(pid, &status, 0);
+		g_exit_status = WEXITSTATUS(status);
+	}
+	else
+		perror("fork");
+}
+
+// static void	command_slash_exec(t_cmd *cmd, char **env)
+// {
+// 	execve(cmd->argv[0], cmd->argv, env);
+// 	fprintf(stderr, "Minishell: %s: %s\n",
+// 		cmd->argv[0], strerror(errno));
+// 	exit(127);
+// }
+
+// void	execute_command(t_cmd *cmd, char **env)
+// {
+// 	pid_t	pid;
+// 	int		status;
+
+// 	pid = fork();
+// 	if (pid == 0)
+// 	{
+// 		setup_redirections(cmd);
+// 		if (strchr(cmd->argv[0], '/'))
+// 			command_slash_exec(cmd->argv[0], env);
+// 		else
+// 		{
+// 			execvp(cmd->argv[0], cmd->argv);
+// 			fprintf(stderr, "Minishell: command not found: %s\n",
+// 				cmd->argv[0]);
+// 			exit(127);
+// 		}
+// 	}
+// 	else if (pid > 0)
+// 	{
+// 		waitpid(pid, &status, 0);
+// 		g_exit_status = WEXITSTATUS(status);
+// 	}
+// 	else
+// 		perror("fork");
+// }
+
+void	execute_cmds(t_cmd *cmds)
+{
+	t_cmd	*cur;
+
+	cur = cmds;
+	while (cur)
+	{
+		execute_command(cur);
+		cur = cur->next;
 	}
 }
 
-// Exemple d’utilisation
-#include <stdio.h>
-#include <readline/readline.h>
-#include <readline/history.h>
-
-int main(int argc, char **argv, char **envp)
+int	main(int argc, char **argv, char **envp)
 {
-    (void)argc;
+	t_lexer	lx;
+	char	*line;
+	char	**env;
+
+	(void)argc;
 	(void)argv;
-
-    t_lexer lx;
-    char *line;
-    t_token *tokens;
-    char **env;
-
 	env = init_env(envp);
+	if (!env)
+		return (1);
+	g_exit_status = 0;
 	while (1)
 	{
-		if (!env)
-			break ;
-		lx.head = NULL;
-		lx.last = NULL;
 		line = readline("minishell $ ");
 		if (!line)
-		{
-			printf("\n");
 			break ;
-		}
 		if (*line)
 			add_history(line);
-		tokens = tokenize(line, &lx, env);
-		if (!tokens)
-		{
-			printf("Erreur de tokenization\n");
-			free(line);
-			continue ;
-		}
-		printf("=====TOKENISATION=====\n");
-		print_tokens(tokens);
-		printf("=====PARSING=====\n");
-		parser(&lx);
-		printf("=====EXEC=====\n");
+		process_line(&lx, line, env);
 		free(line);
-		for (int p = 0; env[p]; p++)
-			free(env[p]);
-		free(env);
-		exit(1);
 	}
-	return (0);
+	printf("exit\n");
+	return (g_exit_status);
 }
-

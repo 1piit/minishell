@@ -137,3 +137,15 @@ fclean: clean
 
 # ===================================================
 re: fclean all
+
+tags: ${SRCS}
+	ctags ${SRCS}
+
+v: tags
+	vim ${SRCS} minishell.h Makefile
+
+supp.supp:
+	echo "{\nignore_libreadline_leaks\nMemcheck:Leak\n...\nobj:*/libreadline.so.*\n}" > supp.supp
+
+val: supp.supp ${NAME}
+	valgrind --leak-check=full --show-leak-kinds=all --show-reachable=yes --track-origins=yes --trace-children=yes --track-fds=yes --undef-value-errors=yes ./minishell
