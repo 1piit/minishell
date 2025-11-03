@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/31 21:33:14 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/03 14:32:22 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -144,6 +144,7 @@ int		my_exit(char **argv);
 // === MINISHELL ===
 int		main(int ac, char **av, char **envp);
 char	**init_env(char **envp);
+void	free_env(char **env);
 char	*get_input(const char *prompt);
 char	*token_type_to_str(t_tokentype type);
 
@@ -175,12 +176,20 @@ void	setup_redirections(t_cmd *cmd);
 t_cmd	*parse_command(t_token **current);
 
 // === EXECUTION ===
-void	execute_cmds(t_cmd *cmds, char ***env);
+void	execute_cmds(t_cmd *cmd, char ***env);
 void	redir_apply_in(t_redir *r);
 void	redir_apply_out(t_redir *r);
 
 // === TEST_UTILS ===
 void	assert_eq(int value, int expected, char *file, int line);
 void	assert_str_eq(char *value, char *expected, char *file, int line);
+
+// === FREE_UTILS ===
+void	free_tokens(t_lexer *lx);
+void	free_all_cmds(t_cmd *cmds);
+void	free_cmd(t_cmd *cmd);
+void	free_redirs(t_redir *redir);
+void	free_env_tab(char **env);
+void	free_env_list(t_env *env);
 
 #endif

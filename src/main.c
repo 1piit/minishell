@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:39:17 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/31 22:02:33 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/03 14:33:25 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,12 +31,35 @@ static void	process_line(t_lexer *lx, char *line, char ***env)
 	lexer_init(lx);
 	tokenize(line, lx, *env);
 	cmds = parser(lx);
-	while (cmds)
-	{
+	if (cmds)
 		execute_cmds(cmds, env);
-		cmds = cmds->next;
-	}
 }
+/*
+void	execute_command(t_cmd *cmd)
+{
+	pid_t	pid;
+	int		status;
+
+	pid = fork();
+	if (pid == 0)
+	{
+		setup_redirections(cmd);
+		if (execvp(cmd->argv[0], cmd->argv) == -1)
+		{
+			fprintf(stderr, "Minishell: command not found: "
+				"%s\n", cmd->argv[0]);
+			exit(1);
+		}
+	}
+	else if (pid > 0)
+	{
+		waitpid(pid, &status, 0);
+		g_exit_status = WEXITSTATUS(status);
+	}
+	else
+		perror("fork");
+}
+*/
 
 int	main(int argc, char **argv, char **envp)
 {
@@ -52,7 +75,11 @@ int	main(int argc, char **argv, char **envp)
 	g_exit_status = 0;
 	while (1)
 	{
-		line = get_input("minishell $ ");
+		line = readline("minishell $ ");
+		if (!line)
+			break ;
+		if (*line)
+			add_history(line);
 		process_line(&lx, line, &env);
 		free(line);
 	}
