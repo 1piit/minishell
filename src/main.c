@@ -5,83 +5,100 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/10/28 16:11:58 by rgalmich         ###   ########.fr       */
+/*   Created: 2025/10/29 16:39:17 by rgalmich          #+#    #+#             */
+/*   Updated: 2025/11/03 16:40:04 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
 int	g_exit_status = 0;
-/*
-if (exec_failed)
-	g_exit_status = 127;
-else
-	g_exit_status = WEXITSTATUS(status);
-*/
-// Fonction pour afficher la liste de tokens
 
-void	print_tokens(t_token *head)
+void	lexer_init(t_lexer *lx)
 {
-	t_token	*tmp;
-
-	tmp = head;
-	while (tmp)
-	{
-		printf(RED "Type: %s, Word: [%s]\n\n" NC,
-			token_type_to_str(tmp->type), tmp->word ? tmp->word : "(null)");
-		tmp = tmp->next;
-	}
+	lx->head = NULL;
+	lx->last = NULL;
+	lx->j = 0;
+	lx->word[0] = '\0';
+	lx->quote = 0;
+	lx->cmds = NULL;
 }
 
-// Exemple d’utilisation
-#include <stdio.h>
-#include <readline/readline.h>
-#include <readline/history.h>
-
-int main(int argc, char **argv, char **envp)
+static void	process_line(t_lexer *lx, char *line, char ***env)
 {
-    (void)argc;
+	t_cmd	*cmds;
+	t_cmd	*tmp;
+
+	lexer_init(lx);
+	tokenize(line, lx, *env);
+	cmds = parser(lx);
+	while (cmds)
+	{
+		tmp = cmds->next;
+		execute_cmds(cmds, env);
+		free_cmd(cmds);
+		cmds = tmp;
+	}
+	free_tokens(lx);
+	lx->cmds = NULL;
+	lx->head = NULL;
+}
+/*
+void	execute_command(t_cmd *cmd)
+{
+	pid_t	pid;
+	int		status;
+
+	pid = fork();
+	if (pid == 0)
+	{
+		setup_redirections(cmd);
+		if (execvp(cmd->argv[0], cmd->argv) == -1)
+		{
+			fprintf(stderr, "Minishell: command not found: "
+				"%s\n", cmd->argv[0]);
+			exit(1);
+		}
+	}
+	else if (pid > 0)
+	{
+		waitpid(pid, &status, 0);
+		g_exit_status = WEXITSTATUS(status);
+	}
+	else
+		perror("fork");
+}
+*/
+
+int	main(int argc, char **argv, char **envp)
+{
+	t_lexer	lx;
+	char	*line;
+	char	**env;
+
+	(void)argc;
 	(void)argv;
-
-    t_lexer lx;
-    char *line;
-    t_token *tokens;
-    char **env;
-
 	env = init_env(envp);
+	if (!env)
+		return (1);
+	g_exit_status = 0;
+	signal(SIGINT, sigint_handler);
+	signal(SIGQUIT, SIG_IGN);
 	while (1)
 	{
-		if (!env)
-			break ;
-		lx.head = NULL;
-		lx.last = NULL;
-		line = readline("minishell $ ");
+		line = readline("minishell (" VERSION ") $ ");
 		if (!line)
-		{
-			printf("\n");
 			break ;
-		}
 		if (*line)
 			add_history(line);
-		tokens = tokenize(line, &lx, env);
-		if (!tokens)
-		{
-			printf("Erreur de tokenization\n");
-			free(line);
-			continue ;
-		}
-		printf("=====TOKENISATION=====\n");
-		print_tokens(tokens);
-		printf("=====PARSING=====\n");
-		parser(&lx);
-		printf("=====EXEC=====\n");
+		process_line(&lx, line, &env);
+		free_tokens(&lx);
+		free_cmd(lx.cmds);
+		line[0] = '\0';
 		free(line);
-		for (int p = 0; env[p]; p++)
-			free(env[p]);
-		free(env);
-		exit(1);
 	}
-	return (0);
+	free_env_tab(env);
+	clear_history();
+	printf("exit\n");
+	return (g_exit_status);
 }
-

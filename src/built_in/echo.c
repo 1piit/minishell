@@ -3,19 +3,46 @@
 /*                                                        :::      ::::::::   */
 /*   echo.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@42.fr>                  +#+  +:+       +#+        */
+/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/10 13:50:18 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/10 13:50:19 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/10/31 20:06:07 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+int	echo(char **av)
+{
+	int	i;
+	int	newline;
+
+	if (!av || !av[0])
+		return (1);
+	i = 1;
+	newline = 1;
+	if (av[i] && ft_strcmp(av[i], "-n") == 0)
+	{
+		newline = 0;
+		i++;
+	}
+	while (av[i])
+	{
+		printf("%s", av[i]);
+		if (av[i + 1])
+			printf(" ");
+		i++;
+	}
+	if (newline)
+		printf("\n");
+	return (0);
+}
+
+/*
 int	echo(char **av, char **alloc_env)
 {
-	int		i;
-	int		newline;
+	int	i;
+	int	newline;
 
 	i = 1;
 	newline = 0;
@@ -29,7 +56,7 @@ int	echo(char **av, char **alloc_env)
 	echo_print_env(av, i, alloc_env);
 	if (!newline)
 		printf("\n");
-	else if (newline)
+	else
 		printf(BLACK "%%" NC "\n");
 	return (0);
 }
@@ -68,3 +95,4 @@ void	echo_print_env(char **av, int i, char **alloc_env)
 		i++;
 	}
 }
+*/

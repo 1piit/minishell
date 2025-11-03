@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/27 13:54:14 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/03 16:37:27 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,11 +24,13 @@
 # include <dirent.h>
 # include <sys/stat.h>
 # include <string.h>
+# include <signal.h>
 # include <sys/wait.h>
 # include <errno.h>
+# include <fcntl.h>
 
 // === VERSION ===
-# define VERSION		"V0.2"
+# define VERSION		"V0.8"
 
 // === COLOURS ===
 # define NC				"\001\033[0m\002"
@@ -54,7 +56,7 @@ typedef struct s_env
 typedef struct s_redir
 {
 	int				type;
-	char			*filename;
+	char			*file;
 	struct s_redir	*next;
 }	t_redir;
 
@@ -102,8 +104,8 @@ typedef struct s_lexer
 	char	word[4096];
 	int		j;
 	char	quote;
+	t_cmd	*cmds;
 }	t_lexer;
-
 
 typedef struct s_exec
 {
@@ -128,21 +130,23 @@ typedef struct s_heredoc
 }	t_heredoc;
 
 // === BUILT-IN ===
-int		cd(char *path);
+int		cd(char *path, char ***env);
 int		pwd(void);
-int		env(char **envp);
-int		echo(char **av, char **alloc_env);
-void	echo_print_env(char **av, int i, char **alloc_env);
-void	export_no_args(char **env);
+int		my_env(char **envp);
+int		echo(char **av);
+int		my_export(char **args, char ***env);
 char	*get_env_value(char **env, const char *var);
-void	add_or_update_env(char ***env, char *var);
-void	unset(char ***env, char **args);
-void	unset_var(char ***env, char *var);
+void	add_or_update_env(char ***env, const char *var_value);
+int		unset(char ***env, char **args);
+int		is_builtin(char *cmd);
+int		exec_builtin(t_cmd *cmd, char ***env);
+int		my_exit(char **argv);
 
 // === MINISHELL ===
 int		main(int ac, char **av, char **envp);
 char	**init_env(char **envp);
-void	minishell_loop(char **envp);
+void	free_env(char **env);
+char	*get_input(const char *prompt);
 char	*token_type_to_str(t_tokentype type);
 
 // === TOKENISATION ===
@@ -156,12 +160,41 @@ char	*extract_unquoted_part(const char *line, int *i, char **env);
 char	*extract_quoted_part(const char *line, int *i, char **env);
 char	*expand_vars(const char *str, char **env, int expand);
 int		copy_var_value(char *dst, const char *src, int *i, char **env);
+int		append_part(char **word, char *part);
+int		get_part(const char *line, int *i, char **part, char **env);
 
 // PARSER
-int		parser(t_lexer *lx);
+t_cmd	*parser(t_lexer *lx);
+int		errmsg(int special_count, t_token *line);
+void	append_cmd(t_cmd **head, t_cmd **last, t_cmd *cmd);
+int		process_and_append(t_token **line_ptr, t_cmd **head,
+			t_cmd **last);
+t_cmd	*parse_all(t_token **line_ptr);
+
+void	parse_redirections(t_token **current, t_cmd *cmd,
+			int special_count, t_token *line);
+void	setup_redirections(t_cmd *cmd);
+t_cmd	*parse_command(t_token **current);
+
+// === EXECUTION ===
+void	execute_cmds(t_cmd *cmd, char ***env);
+void	redir_apply_in(t_redir *r);
+void	redir_apply_out(t_redir *r);
 
 // === TEST_UTILS ===
 void	assert_eq(int value, int expected, char *file, int line);
 void	assert_str_eq(char *value, char *expected, char *file, int line);
+
+// === FREE_UTILS ===
+void	free_tokens(t_lexer *lx);
+void	free_all_cmds(t_cmd *cmds);
+void	free_cmd(t_cmd *cmd);
+void	free_redirs(t_redir *redir);
+void	free_env_tab(char **env);
+void	free_env_list(t_env *env);
+
+// === SIGNALS ===
+void	sigint_handler(int signo);
+void	sigquit_handler(int signo);
 
 #endif

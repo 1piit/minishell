@@ -6,85 +6,90 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 19:20:39 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/27 14:40:02 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/10/31 09:51:01 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-/*
-void	check_consecutive_operators(t_token *line)
+
+static int	count_specials(t_token *line, t_token **last)
 {
-	t_token	*tmp_operator;
-	int		operator_count;
+	t_token	*tmp;
+	int		count;
 
-	tmp_operator = NULL;
-	operator_count = 0;
-
-	while (line && !tmp_operator)
+	tmp = line;
+	count = 0;
+	while (tmp && tmp->is_operator && count < 2)
 	{
-		if (line->is_operator)
-			tmp_operator = line;
-		line = line->next;
+		count++;
+		tmp = tmp->next;
 	}
-	while (tmp_operator && tmp_operator->is_operator && operator_count < 2)
-	{
-		operator_count++;
-		tmp_operator = tmp_operator->next;
-	}
-	if (operator_count > 1)
-		printf("Pasre error\n");
-	//TODO
-	//Add exit/perror/free
+	*last = tmp;
+	return (count);
 }
 
-int	parser(t_lexer *lx)
+int	handle_specials(t_token **line)
 {
-	t_token	*line;
+	t_token	*after;
+	int		count;
 
-	line = lx->head;
-	while (line)
+	count = count_specials(*line, &after);
+	if (count > 1)
 	{
-		check_consecutive_operators(line);
-		line = line->next;
-		// printf(RED "line->" GREEN "type=%d" RED ", line->" GREEN
-		// 	"is_operator=%d" RED " line->" GREEN "word=%s\n\n"NC"",
-		// 	line->type, line->is_operator, line->word);
+		errmsg(count, *line);
+		return (-1);
 	}
-	return (0);
+	*line = after;
+	return (count);
 }
-*/
 
-int	parser(t_lexer *lx)
+t_cmd	*parse_all(t_token **line_ptr)
 {
 	t_token	*line;
-	t_token	*tmp_special;
+	t_cmd	*head;
+	t_cmd	*last;
 	int		special_count;
 
-	line = lx->head;
+	line = *line_ptr;
+	head = NULL;
+	last = NULL;
 	while (line)
 	{
-		printf(RED "line->" GREEN "type=%d" RED ", line->" GREEN
-			"is_operator=%d" RED " line->" GREEN "word=%s\n\n"NC"",
-			line->type, line->is_operator, line->word);
+		special_count = 0;
 		if (line->is_operator)
 		{
-			tmp_special = line;
-			special_count = 1;
-			while (tmp_special->next && tmp_special->next->is_operator)
-			{
-				special_count++;
-				tmp_special = tmp_special->next;
-			}
-			if (special_count > 1)
-			{
-				printf("Parse error: %d consecutive special tokens\n",
-					special_count);
-				return (1);
-			}
-			line = tmp_special->next;
+			special_count = handle_specials(&line);
+			if (special_count < 0)
+				return (NULL);
+			continue ;
 		}
-		else
-			line = line->next;
+		if (process_and_append(&line, &head, &last) != 0)
+			return (perror("parse_command"), NULL);
 	}
+	*line_ptr = line;
+	return (head);
+}
+
+int	process_and_append(t_token **line_ptr, t_cmd **head,
+					t_cmd **last)
+{
+	t_cmd	*cmd;
+	t_token	*current;
+
+	current = *line_ptr;
+	cmd = parse_command(&current);
+	if (!cmd)
+		return (1);
+	parse_redirections(&current, cmd, 0, *line_ptr);
+	append_cmd(head, last, cmd);
+	*line_ptr = current;
 	return (0);
+}
+
+t_cmd	*parser(t_lexer *lx)
+{
+	t_token	*line;
+
+	line = lx->head;
+	return (parse_all(&line));
 }

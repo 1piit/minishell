@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/25 17:10:47 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/27 14:47:12 by rgalmich         ###   ########.fr       */
+/*   Created: 2025/10/29 16:54:05 by rgalmich          #+#    #+#             */
+/*   Updated: 2025/10/29 16:54:06 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ char	*expand_vars(const char *str, char **env, int expand)
 	{
 		if (str[i] == '$' && str[i + 1])
 		{
-			copied += copy_var_value(&buf[j], str, &i, env);
+			copied = copy_var_value(&buf[j], str, &i, env);
 			j += copied;
 		}
 		else
@@ -36,6 +36,22 @@ char	*expand_vars(const char *str, char **env, int expand)
 	}
 	buf[j] = '\0';
 	return (ft_strdup(buf));
+}
+
+char	*get_env_value(char **env, const char *var)
+{
+	int		i;
+	size_t	len;
+
+	len = ft_strlen(var);
+	i = 0;
+	while (env[i])
+	{
+		if (ft_strncmp(env[i], var, len) == 0 && env[i][len] == '=')
+			return (env[i] + len + 1);
+		i++;
+	}
+	return ("");
 }
 
 int	copy_var_value(char *dst, const char *src, int *i, char **env)
