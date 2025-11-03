@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/03 14:32:22 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/03 16:37:27 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,13 @@
 # include <dirent.h>
 # include <sys/stat.h>
 # include <string.h>
+# include <signal.h>
 # include <sys/wait.h>
 # include <errno.h>
 # include <fcntl.h>
 
 // === VERSION ===
-# define VERSION		"V0.2"
+# define VERSION		"V0.8"
 
 // === COLOURS ===
 # define NC				"\001\033[0m\002"
@@ -191,5 +192,9 @@ void	free_cmd(t_cmd *cmd);
 void	free_redirs(t_redir *redir);
 void	free_env_tab(char **env);
 void	free_env_list(t_env *env);
+
+// === SIGNALS ===
+void	sigint_handler(int signo);
+void	sigquit_handler(int signo);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 13:33:06 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/03 13:42:44 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/03 16:33:52 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,17 +60,13 @@ void	free_all_cmds(t_cmd *cmds)
 
 void	free_tokens(t_lexer *lx)
 {
-	t_token	*curr;
 	t_token	*tmp;
 
-	curr = lx->head;
-	while (curr)
+	while (lx->head)
 	{
-		tmp = curr->next;
-		free(curr->word);
-		free(curr);
-		curr = tmp;
+		tmp = lx->head->next;
+		free(lx->head->word);
+		free(lx->head);
+		lx->head = tmp;
 	}
-	lx->head = NULL;
-	lx->last = NULL;
 }
