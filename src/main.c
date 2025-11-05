@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:39:17 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/03 16:40:04 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/05 18:23:28 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,10 +28,15 @@ static void	process_line(t_lexer *lx, char *line, char ***env)
 {
 	t_cmd	*cmds;
 	t_cmd	*tmp;
+	t_exec	exec;
 
 	lexer_init(lx);
 	tokenize(line, lx, *env);
+	print_tokens(lx);
 	cmds = parser(lx);
+	//print_cmds(cmds);
+	exec_init(&exec, cmds);
+	process_pipeline(&exec, cmds, *env);
 	while (cmds)
 	{
 		tmp = cmds->next;

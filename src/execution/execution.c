@@ -3,26 +3,125 @@
 /*                                                        :::      ::::::::   */
 /*   execution.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 20:41:13 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/29 17:35:47 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/05 19:24:12 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	wait_for_child(pid_t pid)
+int	count_cmds(t_cmd *cmds)
 {
-	int	status;
+	t_cmd	*tmp_cmds;
+	int		count;
 
-	waitpid(pid, &status, 0);
-	if (WIFEXITED(status))
+	tmp_cmds = cmds;
+	count = 0;
+	while (tmp_cmds)
 	{
-		g_exit_status = WEXITSTATUS(status);
+		count++;
+		tmp_cmds = tmp_cmds->next;
 	}
-	else
+	return (count);
+}
+
+void	exec_init(t_exec *exec, t_cmd *cmd)
+{
+	exec->nb_cmds = count_cmds(cmd);
+	exec->fd_in = 0;
+	exec->fd_out = 0;
+	*exec->pipes = (int *)malloc(exec->nb_cmds * sizeof(int *));
+	if (!*(exec->pipes))
+		exit(1);
+	exec->pids = (pid_t *)malloc(exec->nb_cmds * sizeof(pid_t *));
+	if (!*(exec->pids))
+		exit(1);
+}
+
+void	wait_all_childs(t_exec *exec)
+{
+	int		status;
+	pid_t	pid;
+	int		i;
+
+	i = 0;
+	while (i < exec->nb_cmds)
 	{
-		g_exit_status = 1;
+		pid = wait(&status);
+		if (WIFEXITED(status))
+			g_exit_status = WEXITSTATUS(status);
+		else
+			g_exit_status = 1;
+		printf("Fork [%i] terminé avec le code %i\n", pid, status);
+		i++;
 	}
 }
+
+void	process_pipeline(t_exec *exec, t_cmd *cmds, char **env)
+{
+	int	i;
+	int	j;
+
+	//create_pipes()
+	i = 0;
+	while (i < exec->nb_cmds - 1)
+	{
+		pipe(exec->pipes[i]);
+		i++;
+	}
+	//fork_loop()
+	j = 0;
+	while (cmds && j < exec->nb_cmds)
+	{
+		exec->pids[j] = fork();
+		if (exec->pids[j] == -1)
+		{
+			perror("fork");
+			exit(1);
+		}
+		else if (exec->pids[j] == 0)
+		{
+			//on est dans le fils
+			//do something
+		}
+		else
+		{
+			//on est dans le pere
+			//do something
+		}
+		j++;
+	}
+	wait_all_childs(exec);
+	//printf("nb_cmds=%d\n", exec->nb_cmds);
+	//int i = 0;
+	//while (i < exec->nb_cmds)
+	//{
+	//	int j = 0;
+	//	while (j < 2)
+	//	{
+	//		printf("1");
+	//		j++;
+	//	}
+	//	printf("\n");
+	//	i++;
+	//}
+	(void)env;
+	(void)cmds;
+}
+
+//void	wait_for_child(pid_t pid)
+//{
+//	int	status;
+
+//	waitpid(pid, &status, 0);
+//	if (WIFEXITED(status))
+//	{
+//		g_exit_status = WEXITSTATUS(status);
+//	}
+//	else
+//	{
+//		g_exit_status = 1;
+//	}
+//}

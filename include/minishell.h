@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/03 16:37:27 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/05 18:56:30 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,10 +109,11 @@ typedef struct s_lexer
 
 typedef struct s_exec
 {
-	int	pid;
-	int	fd_in;
-	int	fd_out;
-	int	pipe_fd[2];
+	int		nb_cmds;
+	int		fd_in;
+	int		fd_out;
+	int		*pipes[2];
+	pid_t	*pids;
 }	t_exec;
 
 typedef struct s_expand
@@ -177,9 +178,12 @@ void	setup_redirections(t_cmd *cmd);
 t_cmd	*parse_command(t_token **current);
 
 // === EXECUTION ===
+int		count_cmds(t_cmd *cmds);
+void	exec_init(t_exec *exec, t_cmd *cmd);
 void	execute_cmds(t_cmd *cmd, char ***env);
 void	redir_apply_in(t_redir *r);
 void	redir_apply_out(t_redir *r);
+void	process_pipeline(t_exec *exec, t_cmd *cmds, char **env);
 
 // === TEST_UTILS ===
 void	assert_eq(int value, int expected, char *file, int line);
@@ -196,5 +200,9 @@ void	free_env_list(t_env *env);
 // === SIGNALS ===
 void	sigint_handler(int signo);
 void	sigquit_handler(int signo);
+
+// === UTILS ===
+void	print_tokens(t_lexer *lx);
+void	print_cmds(t_cmd *cmd);
 
 #endif
