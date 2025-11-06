@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 19:20:39 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/05 17:14:11 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/06 23:01:25 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,6 @@ t_cmd	*parse_all(t_token **line_ptr)
 	last = NULL;
 	while (line)
 	{
-		printf("current=%s\n", line->word);
 		special_count = 0;
 		if (line->is_operator)
 		{

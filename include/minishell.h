@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/05 18:56:30 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/06 22:40:12 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,7 @@ typedef struct s_exec
 	int		nb_cmds;
 	int		fd_in;
 	int		fd_out;
-	int		*pipes[2];
+	int		(*pipes)[2];
 	pid_t	*pids;
 }	t_exec;
 
@@ -180,10 +180,10 @@ t_cmd	*parse_command(t_token **current);
 // === EXECUTION ===
 int		count_cmds(t_cmd *cmds);
 void	exec_init(t_exec *exec, t_cmd *cmd);
+void	process_pipeline(t_exec *exec, t_cmd *cmds, char **env);
 void	execute_cmds(t_cmd *cmd, char ***env);
 void	redir_apply_in(t_redir *r);
 void	redir_apply_out(t_redir *r);
-void	process_pipeline(t_exec *exec, t_cmd *cmds, char **env);
 
 // === TEST_UTILS ===
 void	assert_eq(int value, int expected, char *file, int line);

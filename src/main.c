@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:39:17 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/05 18:23:28 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/06 23:01:37 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,23 +27,26 @@ void	lexer_init(t_lexer *lx)
 static void	process_line(t_lexer *lx, char *line, char ***env)
 {
 	t_cmd	*cmds;
-	t_cmd	*tmp;
+	//t_cmd	*tmp;
 	t_exec	exec;
 
 	lexer_init(lx);
 	tokenize(line, lx, *env);
-	print_tokens(lx);
+	//print_tokens(lx);
+	//printf("before parser\n");
 	cmds = parser(lx);
+	//printf("before exec_init\n");
 	//print_cmds(cmds);
 	exec_init(&exec, cmds);
+	//printf("before process_pipeline\n");
 	process_pipeline(&exec, cmds, *env);
-	while (cmds)
-	{
-		tmp = cmds->next;
-		execute_cmds(cmds, env);
-		free_cmd(cmds);
-		cmds = tmp;
-	}
+	//while (cmds)
+	//{
+	//	tmp = cmds->next;
+	//	execute_cmds(cmds, env);
+	//	free_cmd(cmds);
+	//	cmds = tmp;
+	//}
 	free_tokens(lx);
 	lx->cmds = NULL;
 	lx->head = NULL;

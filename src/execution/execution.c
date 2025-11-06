@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 20:41:13 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/05 19:24:12 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/06 23:06:27 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,11 +32,11 @@ void	exec_init(t_exec *exec, t_cmd *cmd)
 	exec->nb_cmds = count_cmds(cmd);
 	exec->fd_in = 0;
 	exec->fd_out = 0;
-	*exec->pipes = (int *)malloc(exec->nb_cmds * sizeof(int *));
-	if (!*(exec->pipes))
+	exec->pipes = malloc(exec->nb_cmds * sizeof(*exec->pipes));
+	if (!exec->pipes)
 		exit(1);
-	exec->pids = (pid_t *)malloc(exec->nb_cmds * sizeof(pid_t *));
-	if (!*(exec->pids))
+	exec->pids = malloc(exec->nb_cmds * sizeof(*exec->pids));
+	if (!exec->pids)
 		exit(1);
 }
 
@@ -83,17 +83,21 @@ void	process_pipeline(t_exec *exec, t_cmd *cmds, char **env)
 		}
 		else if (exec->pids[j] == 0)
 		{
+			printf("Process enfant: pid=%d\n", exec->pids[j]);
 			//on est dans le fils
 			//do something
 		}
 		else
 		{
+			printf("Process parent: pid=%d\n", exec->pids[j]);
 			//on est dans le pere
 			//do something
 		}
 		j++;
+		cmds = cmds->next;
 	}
-	wait_all_childs(exec);
+	printf("j=%d\n", j);
+	//wait_all_childs(exec);
 	//printf("nb_cmds=%d\n", exec->nb_cmds);
 	//int i = 0;
 	//while (i < exec->nb_cmds)
@@ -108,7 +112,6 @@ void	process_pipeline(t_exec *exec, t_cmd *cmds, char **env)
 	//	i++;
 	//}
 	(void)env;
-	(void)cmds;
 }
 
 //void	wait_for_child(pid_t pid)
