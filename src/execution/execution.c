@@ -6,26 +6,11 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 20:41:13 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/06 23:06:27 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/07 00:36:36 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-int	count_cmds(t_cmd *cmds)
-{
-	t_cmd	*tmp_cmds;
-	int		count;
-
-	tmp_cmds = cmds;
-	count = 0;
-	while (tmp_cmds)
-	{
-		count++;
-		tmp_cmds = tmp_cmds->next;
-	}
-	return (count);
-}
 
 void	exec_init(t_exec *exec, t_cmd *cmd)
 {
@@ -50,6 +35,11 @@ void	wait_all_childs(t_exec *exec)
 	while (i < exec->nb_cmds)
 	{
 		pid = wait(&status);
+		if (!pid)
+		{
+			perror("wait pid");
+			exit(1);
+		}
 		if (WIFEXITED(status))
 			g_exit_status = WEXITSTATUS(status);
 		else
@@ -61,17 +51,8 @@ void	wait_all_childs(t_exec *exec)
 
 void	process_pipeline(t_exec *exec, t_cmd *cmds, char **env)
 {
-	int	i;
 	int	j;
 
-	//create_pipes()
-	i = 0;
-	while (i < exec->nb_cmds - 1)
-	{
-		pipe(exec->pipes[i]);
-		i++;
-	}
-	//fork_loop()
 	j = 0;
 	while (cmds && j < exec->nb_cmds)
 	{
@@ -84,18 +65,41 @@ void	process_pipeline(t_exec *exec, t_cmd *cmds, char **env)
 		else if (exec->pids[j] == 0)
 		{
 			printf("Process enfant: pid=%d\n", exec->pids[j]);
-			//on est dans le fils
-			//do something
+			if (j > 0)
+			{
+				if (dup2(exec->pipes[j - 1][0], STDIN_FILENO) == -1)
+				{
+					perror("dup2 stdin");
+					exit(1);
+				}
+			}
+			if (j < exec->nb_cmds - 1)
+			{
+				if (dup2(exec->pipes[j][1], STDOUT_FILENO) == -1)
+				{
+					perror("dup2 stdout");
+					exit(1);
+				}
+			}
+			close_pipes_fds(exec);
+			//1)Creer les redirections ici
+			//2)Lancer l'exec
+			// => a checker cette fonction, possible de recuperer en modifiant un peu
+			//execute_cmds()
 		}
 		else
 		{
 			printf("Process parent: pid=%d\n", exec->pids[j]);
-			//on est dans le pere
-			//do something
+			if (j > 0)
+				close(pipes(exec->pipes[j - 1][0]));
+			if (j < exec->nb_cmds - 1)
+				close(pipes(exec->pipes[j][1]));
 		}
 		j++;
 		cmds = cmds->next;
 	}
+	close_pipes_fds(exec);
+	wait_all_childs(exec);
 	printf("j=%d\n", j);
 	//wait_all_childs(exec);
 	//printf("nb_cmds=%d\n", exec->nb_cmds);
