@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minishell_loop.c                                   :+:      :+:    :+:   */
+/*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 12:27:27 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/10 18:56:23 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/10 19:09:42 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ static void	process_line(t_lexer *lx, char *line, char ***env)
 	lx->head = NULL;
 }
 
-void	minishell_loop(char **env)
+void	minishell_loop(char ***env)
 {
 	t_lexer	lx;
 	char	*line;
@@ -49,7 +49,7 @@ void	minishell_loop(char **env)
 			break ;
 		if (*line)
 			add_history(line);
-		process_line(&lx, line, &env);
+		process_line(&lx, line, env);
 		free_tokens(&lx);
 		free_cmd(lx.cmds);
 		line[0] = '\0';

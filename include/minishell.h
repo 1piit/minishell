@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/10 18:55:05 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/10 19:08:34 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,7 +145,7 @@ int		my_exit(char **argv);
 
 // === MINISHELL ===
 int		main(int ac, char **av, char **envp);
-void	minishell_loop(char **env);
+void	minishell_loop(char ***env);
 char	**init_env(char **envp);
 void	free_env(char **env);
 char	*token_type_to_str(t_tokentype type);
