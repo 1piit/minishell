@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/10 12:53:29 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/10 15:02:02 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,6 +180,7 @@ t_cmd	*parse_command(t_token **current);
 // === EXECUTION ===
 int		count_cmds(t_cmd *cmds);
 void	exec_init(t_exec *exec, t_cmd *cmd);
+void	create_pipes(t_exec *exec);
 void	close_pipes_fds(t_exec *exec);
 void	wait_all_childs(t_exec *exec);
 void	process_pipeline(t_exec *exec, t_cmd *cmds, char ***env);
