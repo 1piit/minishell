@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 16:25:44 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/06 22:33:42 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/10 19:02:09 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,8 @@
 void	sigint_handler(int signo)
 {
 	(void)signo;
-
 	printf("\n");
 	rl_on_new_line();
-	//rl_replace_line("", 0);
 	rl_redisplay();
 }
 

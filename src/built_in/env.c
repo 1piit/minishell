@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:53:40 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/29 16:53:41 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/10 18:58:48 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int	my_env(char **envp)
 	i = 0;
 	while (envp[i])
 	{
-		printf(WHITE "%s\n" NC, envp[i]);
+		printf("%s\n", envp[i]);
 		i++;
 	}
 	return (0);

@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/10 18:37:58 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/10 18:55:05 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -145,9 +145,9 @@ int		my_exit(char **argv);
 
 // === MINISHELL ===
 int		main(int ac, char **av, char **envp);
+void	minishell_loop(char **env);
 char	**init_env(char **envp);
 void	free_env(char **env);
-char	*get_input(const char *prompt);
 char	*token_type_to_str(t_tokentype type);
 
 // === TOKENISATION ===
@@ -167,6 +167,7 @@ int		get_part(const char *line, int *i, char **part, char **env);
 // === PARSER ===
 t_cmd	*parser(t_lexer *lx);
 int		errmsg(int special_count, t_token *line);
+int		handle_specials(t_token **line);
 void	append_cmd(t_cmd **head, t_cmd **last, t_cmd *cmd);
 int		process_and_append(t_token **line_ptr, t_cmd **head,
 			t_cmd **last);
