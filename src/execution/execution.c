@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 20:41:13 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/07 00:36:36 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/10 14:40:34 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void	exec_init(t_exec *exec, t_cmd *cmd)
 	exec->nb_cmds = count_cmds(cmd);
 	exec->fd_in = 0;
 	exec->fd_out = 0;
-	exec->pipes = malloc(exec->nb_cmds * sizeof(*exec->pipes));
+	exec->pipes = malloc((exec->nb_cmds -1) * sizeof(*exec->pipes));
 	if (!exec->pipes)
 		exit(1);
 	exec->pids = malloc(exec->nb_cmds * sizeof(*exec->pids));
@@ -34,22 +34,20 @@ void	wait_all_childs(t_exec *exec)
 	i = 0;
 	while (i < exec->nb_cmds)
 	{
-		pid = wait(&status);
-		if (!pid)
+		pid = waitpid(exec->pids[i], &status, 0);
+		if (pid > 0)
 		{
-			perror("wait pid");
-			exit(1);
+			if (WIFEXITED(status))
+				g_exit_status = WEXITSTATUS(status);
+			else
+				g_exit_status = 1;
+			printf("Fork [%i] terminé avec le code %i\n", pid, status);
 		}
-		if (WIFEXITED(status))
-			g_exit_status = WEXITSTATUS(status);
-		else
-			g_exit_status = 1;
-		printf("Fork [%i] terminé avec le code %i\n", pid, status);
 		i++;
 	}
 }
 
-void	process_pipeline(t_exec *exec, t_cmd *cmds, char **env)
+void	process_pipeline(t_exec *exec, t_cmd *cmds, char ***env)
 {
 	int	j;
 
@@ -67,7 +65,11 @@ void	process_pipeline(t_exec *exec, t_cmd *cmds, char **env)
 			printf("Process enfant: pid=%d\n", exec->pids[j]);
 			if (j > 0)
 			{
-				if (dup2(exec->pipes[j - 1][0], STDIN_FILENO) == -1)
+				fprintf(stderr, "1/[child %d] dup2 (%d -> 0), (%d -> 1)\n",
+					j,
+					(j>0 ? exec->pipes[j-1][0] : -1),
+					(j<exec->nb_cmds-1 ? exec->pipes[j][1] : -1));
+				if (dup2(exec->pipes[j -1][0], STDIN_FILENO) == -1)
 				{
 					perror("dup2 stdin");
 					exit(1);
@@ -75,6 +77,10 @@ void	process_pipeline(t_exec *exec, t_cmd *cmds, char **env)
 			}
 			if (j < exec->nb_cmds - 1)
 			{
+				fprintf(stderr, "2/[child %d] dup2 (%d -> 0), (%d -> 1)\n",
+					j,
+					(j>0 ? exec->pipes[j-1][0] : -1),
+					(j<exec->nb_cmds-1 ? exec->pipes[j][1] : -1));
 				if (dup2(exec->pipes[j][1], STDOUT_FILENO) == -1)
 				{
 					perror("dup2 stdout");
@@ -82,18 +88,19 @@ void	process_pipeline(t_exec *exec, t_cmd *cmds, char **env)
 				}
 			}
 			close_pipes_fds(exec);
-			//1)Creer les redirections ici
-			//2)Lancer l'exec
-			// => a checker cette fonction, possible de recuperer en modifiant un peu
-			//execute_cmds()
+
+			execute_cmds(cmds, env, exec->pids[j]);
+			fprintf(stderr, "[child %d] post-execute, exiting with %d\n",
+							j, g_exit_status);
+			exit(g_exit_status);
 		}
 		else
 		{
 			printf("Process parent: pid=%d\n", exec->pids[j]);
-			if (j > 0)
-				close(pipes(exec->pipes[j - 1][0]));
-			if (j < exec->nb_cmds - 1)
-				close(pipes(exec->pipes[j][1]));
+			//if (j > 0)
+			//	close(exec->pipes[j -1][0]);
+			//if (j < exec->nb_cmds - 1)
+			//	close(exec->pipes[j][1]);
 		}
 		j++;
 		cmds = cmds->next;
@@ -115,7 +122,7 @@ void	process_pipeline(t_exec *exec, t_cmd *cmds, char **env)
 	//	printf("\n");
 	//	i++;
 	//}
-	(void)env;
+	//(void)env;
 }
 
 //void	wait_for_child(pid_t pid)

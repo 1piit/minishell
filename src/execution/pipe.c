@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/07 00:07:11 by pbride            #+#    #+#             */
-/*   Updated: 2025/11/07 00:09:52 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/10 12:29:16 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,8 @@ void	close_pipes_fds(t_exec *exec)
 	i = 0;
 	while (i < exec->nb_cmds - 1)
 	{
-		close(pipe(exec->pipes[i][0]));
-		close(pipe(exec->pipes[i][1]));
+		close(exec->pipes[i][0]);
+		close(exec->pipes[i][1]);
+		i++;
 	}
 }

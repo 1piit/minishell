@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/06 23:33:02 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/10 12:53:29 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,8 +182,8 @@ int		count_cmds(t_cmd *cmds);
 void	exec_init(t_exec *exec, t_cmd *cmd);
 void	close_pipes_fds(t_exec *exec);
 void	wait_all_childs(t_exec *exec);
-void	process_pipeline(t_exec *exec, t_cmd *cmds, char **env);
-void	execute_cmds(t_cmd *cmd, char ***env);
+void	process_pipeline(t_exec *exec, t_cmd *cmds, char ***env);
+void	execute_cmds(t_cmd *cmd, char ***env, pid_t pid);
 void	redir_apply_in(t_redir *r);
 void	redir_apply_out(t_redir *r);
 

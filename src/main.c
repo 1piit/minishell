@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:39:17 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/06 23:01:37 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/10 12:54:11 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ static void	process_line(t_lexer *lx, char *line, char ***env)
 	//print_cmds(cmds);
 	exec_init(&exec, cmds);
 	//printf("before process_pipeline\n");
-	process_pipeline(&exec, cmds, *env);
+	process_pipeline(&exec, cmds, env);
 	//while (cmds)
 	//{
 	//	tmp = cmds->next;

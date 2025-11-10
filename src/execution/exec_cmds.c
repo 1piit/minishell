@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_cmds.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/31 22:02:09 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/03 10:23:53 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/10 14:36:24 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,11 +16,17 @@ void	exec_cmds_pid(t_cmd *cmd, pid_t pid, char ***env)
 {
 	if (pid == 0)
 	{
-		setup_redirections(cmd);
+		//setup_redirections(cmd);
 		if (ft_strchr(cmd->argv[0], '/'))
+		{
+			printf("je suis dans execve\n");
 			execve(cmd->argv[0], cmd->argv, *env);
+		}
 		else
+		{
+			printf("je suis dans execvp\n");
 			execvp(cmd->argv[0], cmd->argv);
+		}
 		printf("Minishell: %s: %s\n", cmd->argv[0], strerror(errno));
 		exit(127);
 	}
@@ -33,10 +39,10 @@ static void	save_before_exec(t_cmd *cmd, int *saved_stdin, int *saved_stdout)
 	setup_redirections(cmd);
 }
 
-void	execute_cmds(t_cmd *cmd, char ***env)
+void	execute_cmds(t_cmd *cmd, char ***env, pid_t pid)
 {
-	pid_t	pid;
-	int		status;
+	//pid_t	pid;
+	//int		status;
 	int		saved_stdout;
 	int		saved_stdin;
 
@@ -50,13 +56,15 @@ void	execute_cmds(t_cmd *cmd, char ***env)
 		close(saved_stdin);
 		return ;
 	}
-	pid = fork();
+	//pid = fork();
+	printf("before exec\n");
 	exec_cmds_pid(cmd, pid, env);
-	if (pid > 0)
-	{
-		waitpid(pid, &status, 0);
-		g_exit_status = WEXITSTATUS(status);
-	}
-	else
-		perror("fork");
+	printf("after exec\n");
+	//if (pid > 0)
+	//{
+	//	waitpid(pid, &status, 0);
+	//	g_exit_status = WEXITSTATUS(status);
+	//}
+	//else
+	//	perror("fork");
 }
