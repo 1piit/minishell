@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/10 15:02:02 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/10 18:27:41 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,7 +164,7 @@ int		copy_var_value(char *dst, const char *src, int *i, char **env);
 int		append_part(char **word, char *part);
 int		get_part(const char *line, int *i, char **part, char **env);
 
-// PARSER
+// === PARSER ===
 t_cmd	*parser(t_lexer *lx);
 int		errmsg(int special_count, t_token *line);
 void	append_cmd(t_cmd **head, t_cmd **last, t_cmd *cmd);
@@ -178,13 +178,18 @@ void	setup_redirections(t_cmd *cmd);
 t_cmd	*parse_command(t_token **current);
 
 // === EXECUTION ===
+// PIPE
+void	close_pipes_fds(t_exec *exec);
+void	create_pipes(t_exec *exec);
+void	process_childs(int cmds_index, t_exec *exec, t_cmd *cmds, char ***env);
+void	process_parent(int cmds_index, t_exec *exec);
+void	process_pipeline(t_exec *exec, t_cmd *cmds, char ***env);
+// EXEC
 int		count_cmds(t_cmd *cmds);
 void	exec_init(t_exec *exec, t_cmd *cmd);
-void	create_pipes(t_exec *exec);
-void	close_pipes_fds(t_exec *exec);
 void	wait_all_childs(t_exec *exec);
-void	process_pipeline(t_exec *exec, t_cmd *cmds, char ***env);
 void	execute_cmds(t_cmd *cmd, char ***env, pid_t pid);
+// REDIR
 void	redir_apply_in(t_redir *r);
 void	redir_apply_out(t_redir *r);
 

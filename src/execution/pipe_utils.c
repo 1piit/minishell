@@ -1,26 +1,38 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   execution.c                                        :+:      :+:    :+:   */
+/*   pipe_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/23 20:41:13 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/10 18:27:17 by pbride           ###   ########.fr       */
+/*   Created: 2025/11/10 18:17:32 by pbride            #+#    #+#             */
+/*   Updated: 2025/11/10 18:17:51 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	exec_init(t_exec *exec, t_cmd *cmd)
+void	create_pipes(t_exec *exec)
 {
-	exec->nb_cmds = count_cmds(cmd);
-	exec->fd_in = 0;
-	exec->fd_out = 0;
-	exec->pipes = malloc((exec->nb_cmds -1) * sizeof(*exec->pipes));
-	if (!exec->pipes)
-		exit(1);
-	exec->pids = malloc(exec->nb_cmds * sizeof(*exec->pids));
-	if (!exec->pids)
-		exit(1);
+	int	i;
+
+	i = 0;
+	while (i < exec->nb_cmds - 1)
+	{
+		pipe(exec->pipes[i]);
+		i++;
+	}
+}
+
+void	close_pipes_fds(t_exec *exec)
+{
+	int	i;
+
+	i = 0;
+	while (i < exec->nb_cmds - 1)
+	{
+		close(exec->pipes[i][0]);
+		close(exec->pipes[i][1]);
+		i++;
+	}
 }
