@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/10 18:27:41 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/10 18:37:58 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -174,7 +174,7 @@ t_cmd	*parse_all(t_token **line_ptr);
 
 void	parse_redirections(t_token **current, t_cmd *cmd,
 			int special_count, t_token *line);
-void	setup_redirections(t_cmd *cmd);
+int		setup_redirections(t_cmd *cmd);
 t_cmd	*parse_command(t_token **current);
 
 // === EXECUTION ===
@@ -190,8 +190,10 @@ void	exec_init(t_exec *exec, t_cmd *cmd);
 void	wait_all_childs(t_exec *exec);
 void	execute_cmds(t_cmd *cmd, char ***env, pid_t pid);
 // REDIR
-void	redir_apply_in(t_redir *r);
-void	redir_apply_out(t_redir *r);
+int		redir_apply_in(t_redir *r);
+int		redir_apply_out(t_redir *r);
+int		apply_append(t_redir *r);
+int		handle_heredoc(t_redir *r);
 
 // === TEST_UTILS ===
 void	assert_eq(int value, int expected, char *file, int line);
