@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/31 22:02:09 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/03 10:23:53 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/10 17:24:19 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,8 @@ void	exec_cmds_pid(t_cmd *cmd, pid_t pid, char ***env)
 {
 	if (pid == 0)
 	{
-		setup_redirections(cmd);
+		if (setup_redirections(cmd) == -1)
+			exit(1);
 		if (ft_strchr(cmd->argv[0], '/'))
 			execve(cmd->argv[0], cmd->argv, *env);
 		else
@@ -26,11 +27,10 @@ void	exec_cmds_pid(t_cmd *cmd, pid_t pid, char ***env)
 	}
 }
 
-static void	save_before_exec(t_cmd *cmd, int *saved_stdin, int *saved_stdout)
+static void	save_before_exec(int *saved_stdin, int *saved_stdout)
 {
 	*saved_stdin = dup(STDIN_FILENO);
 	*saved_stdout = dup(STDOUT_FILENO);
-	setup_redirections(cmd);
 }
 
 void	execute_cmds(t_cmd *cmd, char ***env)
@@ -42,7 +42,9 @@ void	execute_cmds(t_cmd *cmd, char ***env)
 
 	if (is_builtin(cmd->argv[0]))
 	{
-		save_before_exec(cmd, &saved_stdin, &saved_stdout);
+		save_before_exec(&saved_stdin, &saved_stdout);
+		if (setup_redirections(cmd) == -1)
+			exit(1);
 		g_exit_status = exec_builtin(cmd, env);
 		dup2(saved_stdout, STDOUT_FILENO);
 		dup2(saved_stdin, STDIN_FILENO);

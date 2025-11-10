@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 17:40:00 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/29 21:34:39 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/10 17:15:28 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,31 +36,4 @@ t_cmd	*parse_command(t_token **current)
 	}
 	cmd->argv[argc] = NULL;
 	return (cmd);
-}
-
-void	setup_redirections(t_cmd *cmd)
-{
-	t_redir	*r;
-	int		fd;
-
-	r = cmd->redir;
-	while (r)
-	{
-		if (r->type == T_REDIR_IN)
-			redir_apply_in(r);
-		else if (r->type == T_REDIR_OUT)
-			redir_apply_out(r);
-		else if (r->type == T_APPEND)
-		{
-			fd = open(r->file, O_WRONLY | O_CREAT | O_APPEND, 0644);
-			if (fd == -1)
-				perror(r->file);
-			else
-			{
-				dup2(fd, STDOUT_FILENO);
-				close(fd);
-			}
-		}
-		r = r->next;
-	}
 }
