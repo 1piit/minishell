@@ -54,17 +54,17 @@ $(NAME): $(MS_OBJS) $(LF_OBJS)
 	@$(C) $(CFLAGS) $(LF_OBJS) $(MS_OBJS) -o $(NAME) $(LDFLAGS)
 	@printf "$(CYAN)Compiling libft !$(NC)\n"
 	@printf "$(BLUE)Compiling minishell !$(NC)\n"
-	@printf "$(YELLOW)Loading: [          ]$(NC)\r"; sleep 0.2
-	@printf "$(YELLOW)Loading: [█         ]$(NC)\r"; sleep 0.1
-	@printf "$(BLUE)Loading: [██        ]$(NC)\r"; sleep 0.1
-	@printf "$(RED)Loading: [███       ]$(NC)\r"; sleep 0.1
-	@printf "$(CYAN)Loading: [████      ]$(NC)\r"; sleep 0.1
-	@printf "$(RED)Loading: [█████     ]$(NC)\r"; sleep 0.1
-	@printf "$(PURPLE)Loading: [██████    ]$(NC)\r"; sleep 0.1
-	@printf "$(RED)Loading: [███████   ]$(NC)\r"; sleep 0.1
-	@printf "$(YELLOW)Loading: [████████  ]$(NC)\r"; sleep 0.1
-	@printf "$(BLUE)Loading: [█████████ ]$(NC)\r"; sleep 0.1
-	@printf "$(YELLOW)Loading: [██████████]$(NC)\n"; sleep 0.2
+#	@printf "$(YELLOW)Loading: [          ]$(NC)\r"; sleep 0.2
+#	@printf "$(YELLOW)Loading: [█         ]$(NC)\r"; sleep 0.1
+#	@printf "$(BLUE)Loading: [██        ]$(NC)\r"; sleep 0.1
+#	@printf "$(RED)Loading: [███       ]$(NC)\r"; sleep 0.1
+#	@printf "$(CYAN)Loading: [████      ]$(NC)\r"; sleep 0.1
+#	@printf "$(RED)Loading: [█████     ]$(NC)\r"; sleep 0.1
+#	@printf "$(PURPLE)Loading: [██████    ]$(NC)\r"; sleep 0.1
+#	@printf "$(RED)Loading: [███████   ]$(NC)\r"; sleep 0.1
+#	@printf "$(YELLOW)Loading: [████████  ]$(NC)\r"; sleep 0.1
+#	@printf "$(BLUE)Loading: [█████████ ]$(NC)\r"; sleep 0.1
+#	@printf "$(YELLOW)Loading: [██████████]$(NC)\n"; sleep 0.2
 	@printf "$(GREEN)✔ Compilation terminée ! $(NAME) est prêt.$(NC)\n\n"
 	@printf "$(PURPLE)\
 MMMMMMMM               MMMMMMMM  iiii                     iiii                  hhhhhhh                                lllllll lllllll \n\

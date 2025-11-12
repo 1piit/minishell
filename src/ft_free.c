@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_free.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 13:33:06 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/03 16:33:52 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/10 19:01:36 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ void	free_cmd(t_cmd *cmd)
 
 	if (!cmd)
 		return ;
-
 	if (cmd->argv)
 	{
 		i = 0;
@@ -40,7 +39,6 @@ void	free_cmd(t_cmd *cmd)
 			free(cmd->argv[i++]);
 		free(cmd->argv);
 	}
-
 	free_redirs(cmd->redir);
 	free(cmd);
 }

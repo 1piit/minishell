@@ -1,39 +1,49 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   echo.c                                             :+:      :+:    :+:   */
+/*   exec_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/10 13:50:18 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/10 19:00:08 by pbride           ###   ########.fr       */
+/*   Created: 2025/11/07 00:08:24 by pbride            #+#    #+#             */
+/*   Updated: 2025/11/10 18:27:09 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	echo(char **av)
+int	count_cmds(t_cmd *cmds)
 {
-	int	i;
-	int	newline;
+	t_cmd	*tmp_cmds;
+	int		count;
 
-	if (!av || !av[0])
-		return (1);
-	i = 1;
-	newline = 1;
-	if (av[i] && ft_strcmp(av[i], "-n") == 0)
+	tmp_cmds = cmds;
+	count = 0;
+	while (tmp_cmds)
 	{
-		newline = 0;
+		count++;
+		tmp_cmds = tmp_cmds->next;
+	}
+	return (count);
+}
+
+void	wait_all_childs(t_exec *exec)
+{
+	int		status;
+	pid_t	pid;
+	int		i;
+
+	i = 0;
+	while (i < exec->nb_cmds)
+	{
+		pid = waitpid(exec->pids[i], &status, 0);
+		if (pid > 0)
+		{
+			if (WIFEXITED(status))
+				g_exit_status = WEXITSTATUS(status);
+			else
+				g_exit_status = 1;
+		}
 		i++;
 	}
-	while (av[i])
-	{
-		printf("%s", av[i]);
-		if (av[i + 1])
-			printf(" ");
-		i++;
-	}
-	if (newline)
-		printf("\n");
-	return (0);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/10 17:16:53 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/12 15:08:05 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@
 # include <sys/wait.h>
 # include <errno.h>
 # include <fcntl.h>
+# include <limits.h>
 
 // === VERSION ===
 # define VERSION		"V0.8"
@@ -109,10 +110,11 @@ typedef struct s_lexer
 
 typedef struct s_exec
 {
-	int	pid;
-	int	fd_in;
-	int	fd_out;
-	int	pipe_fd[2];
+	int		nb_cmds;
+	int		fd_in;
+	int		fd_out;
+	int		(*pipes)[2];
+	pid_t	*pids;
 }	t_exec;
 
 typedef struct s_expand
@@ -144,9 +146,9 @@ int		my_exit(char **argv);
 
 // === MINISHELL ===
 int		main(int ac, char **av, char **envp);
+void	minishell_loop(char ***env);
 char	**init_env(char **envp);
 void	free_env(char **env);
-char	*get_input(const char *prompt);
 char	*token_type_to_str(t_tokentype type);
 
 // === TOKENISATION ===
@@ -163,9 +165,10 @@ int		copy_var_value(char *dst, const char *src, int *i, char **env);
 int		append_part(char **word, char *part);
 int		get_part(const char *line, int *i, char **part, char **env);
 
-// PARSER
+// === PARSER ===
 t_cmd	*parser(t_lexer *lx);
 int		errmsg(int special_count, t_token *line);
+int		handle_specials(t_token **line);
 void	append_cmd(t_cmd **head, t_cmd **last, t_cmd *cmd);
 int		process_and_append(t_token **line_ptr, t_cmd **head,
 			t_cmd **last);
@@ -177,7 +180,18 @@ int		setup_redirections(t_cmd *cmd);
 t_cmd	*parse_command(t_token **current);
 
 // === EXECUTION ===
+// PIPE
+void	close_all_pipes_fds(t_exec *exec);
+void	create_pipes(t_exec *exec);
+void	process_childs(int cmds_index, t_exec *exec, t_cmd *cmds, char ***env);
+void	process_parent(int cmds_index, t_exec *exec);
+void	process_pipeline(t_exec *exec, t_cmd *cmds, char ***env);
+// EXEC
+int		count_cmds(t_cmd *cmds);
+void	exec_init(t_exec *exec, t_cmd *cmd);
+void	wait_all_childs(t_exec *exec);
 void	execute_cmds(t_cmd *cmd, char ***env);
+// REDIR
 int		redir_apply_in(t_redir *r);
 int		redir_apply_out(t_redir *r);
 int		apply_append(t_redir *r);
@@ -198,5 +212,9 @@ void	free_env_list(t_env *env);
 // === SIGNALS ===
 void	sigint_handler(int signo);
 void	sigquit_handler(int signo);
+
+// === UTILS ===
+void	print_tokens(t_lexer *lx);
+void	print_cmds(t_cmd *cmd);
 
 #endif

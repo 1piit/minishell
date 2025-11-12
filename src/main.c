@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:39:17 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/03 16:40:04 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/10 19:09:27 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,66 +14,8 @@
 
 int	g_exit_status = 0;
 
-void	lexer_init(t_lexer *lx)
-{
-	lx->head = NULL;
-	lx->last = NULL;
-	lx->j = 0;
-	lx->word[0] = '\0';
-	lx->quote = 0;
-	lx->cmds = NULL;
-}
-
-static void	process_line(t_lexer *lx, char *line, char ***env)
-{
-	t_cmd	*cmds;
-	t_cmd	*tmp;
-
-	lexer_init(lx);
-	tokenize(line, lx, *env);
-	cmds = parser(lx);
-	while (cmds)
-	{
-		tmp = cmds->next;
-		execute_cmds(cmds, env);
-		free_cmd(cmds);
-		cmds = tmp;
-	}
-	free_tokens(lx);
-	lx->cmds = NULL;
-	lx->head = NULL;
-}
-/*
-void	execute_command(t_cmd *cmd)
-{
-	pid_t	pid;
-	int		status;
-
-	pid = fork();
-	if (pid == 0)
-	{
-		setup_redirections(cmd);
-		if (execvp(cmd->argv[0], cmd->argv) == -1)
-		{
-			fprintf(stderr, "Minishell: command not found: "
-				"%s\n", cmd->argv[0]);
-			exit(1);
-		}
-	}
-	else if (pid > 0)
-	{
-		waitpid(pid, &status, 0);
-		g_exit_status = WEXITSTATUS(status);
-	}
-	else
-		perror("fork");
-}
-*/
-
 int	main(int argc, char **argv, char **envp)
 {
-	t_lexer	lx;
-	char	*line;
 	char	**env;
 
 	(void)argc;
@@ -84,19 +26,7 @@ int	main(int argc, char **argv, char **envp)
 	g_exit_status = 0;
 	signal(SIGINT, sigint_handler);
 	signal(SIGQUIT, SIG_IGN);
-	while (1)
-	{
-		line = readline("minishell (" VERSION ") $ ");
-		if (!line)
-			break ;
-		if (*line)
-			add_history(line);
-		process_line(&lx, line, &env);
-		free_tokens(&lx);
-		free_cmd(lx.cmds);
-		line[0] = '\0';
-		free(line);
-	}
+	minishell_loop(&env);
 	free_env_tab(env);
 	clear_history();
 	printf("exit\n");

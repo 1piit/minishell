@@ -1,39 +1,43 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   echo.c                                             :+:      :+:    :+:   */
+/*   pipe_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/10 13:50:18 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/10 19:00:08 by pbride           ###   ########.fr       */
+/*   Created: 2025/11/10 18:17:32 by pbride            #+#    #+#             */
+/*   Updated: 2025/11/11 16:06:09 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	echo(char **av)
+void	create_pipes(t_exec *exec)
 {
 	int	i;
-	int	newline;
 
-	if (!av || !av[0])
-		return (1);
-	i = 1;
-	newline = 1;
-	if (av[i] && ft_strcmp(av[i], "-n") == 0)
+	i = 0;
+	while (i < exec->nb_cmds - 1)
 	{
-		newline = 0;
+		if (pipe(exec->pipes[i]) == -1)
+		{
+			close_all_pipes_fds(exec);
+			perror("pipe");
+			exit(1);
+		}
 		i++;
 	}
-	while (av[i])
+}
+
+void	close_all_pipes_fds(t_exec *exec)
+{
+	int	i;
+
+	i = 0;
+	while (i < exec->nb_cmds - 1 && exec->pipes)
 	{
-		printf("%s", av[i]);
-		if (av[i + 1])
-			printf(" ");
+		close(exec->pipes[i][0]);
+		close(exec->pipes[i][1]);
 		i++;
 	}
-	if (newline)
-		printf("\n");
-	return (0);
 }

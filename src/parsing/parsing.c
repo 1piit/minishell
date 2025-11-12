@@ -3,44 +3,39 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 19:20:39 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/31 09:51:01 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/10 18:48:38 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static int	count_specials(t_token *line, t_token **last)
+t_cmd	*parse_command(t_token **current)
 {
-	t_token	*tmp;
-	int		count;
+	t_cmd	*cmd;
+	int		argc;
 
-	tmp = line;
-	count = 0;
-	while (tmp && tmp->is_operator && count < 2)
+	cmd = malloc(sizeof(t_cmd));
+	if (!cmd)
+		return (NULL);
+	cmd->argv = malloc(sizeof(char *) * 1024);
+	if (!cmd->argv)
+		return (free(cmd), NULL);
+	cmd->redir = NULL;
+	cmd->fd_in = STDIN_FILENO;
+	cmd->fd_out = STDOUT_FILENO;
+	cmd->next = NULL;
+	argc = 0;
+	while (*current && (*current)->type == T_WORD)
 	{
-		count++;
-		tmp = tmp->next;
+		cmd->argv[argc] = ft_strdup((*current)->word);
+		argc++;
+		*current = (*current)->next;
 	}
-	*last = tmp;
-	return (count);
-}
-
-int	handle_specials(t_token **line)
-{
-	t_token	*after;
-	int		count;
-
-	count = count_specials(*line, &after);
-	if (count > 1)
-	{
-		errmsg(count, *line);
-		return (-1);
-	}
-	*line = after;
-	return (count);
+	cmd->argv[argc] = NULL;
+	return (cmd);
 }
 
 t_cmd	*parse_all(t_token **line_ptr)
