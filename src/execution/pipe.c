@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/07 00:07:11 by pbride            #+#    #+#             */
-/*   Updated: 2025/11/10 18:23:38 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/12 15:53:13 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ void	process_childs(int cmds_index, t_exec *exec, t_cmd *cmds, char ***env)
 	{
 		if (dup2(exec->pipes[cmds_index -1][0], STDIN_FILENO) == -1)
 		{
+			close_all_pipes_fds(exec);
 			perror("dup2 stdin");
 			exit(1);
 		}
@@ -26,12 +27,15 @@ void	process_childs(int cmds_index, t_exec *exec, t_cmd *cmds, char ***env)
 	{
 		if (dup2(exec->pipes[cmds_index][1], STDOUT_FILENO) == -1)
 		{
+			close_all_pipes_fds(exec);
 			perror("dup2 stdout");
 			exit(1);
 		}
 	}
-	close_pipes_fds(exec);
-	execute_cmds(cmds, env, exec->pids[cmds_index]);
+	if (setup_redirections(cmds) == -1)
+		exit(1);
+	close_all_pipes_fds(exec);
+	execute_cmds(cmds, env);
 	exit(g_exit_status);
 }
 
@@ -64,6 +68,6 @@ void	process_pipeline(t_exec *exec, t_cmd *cmds, char ***env)
 		cmds_index++;
 		cmds = cmds->next;
 	}
-	close_pipes_fds(exec);
+	close_all_pipes_fds(exec);
 	wait_all_childs(exec);
 }

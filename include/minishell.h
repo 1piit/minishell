@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/10 19:08:34 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/12 15:08:05 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@
 # include <sys/wait.h>
 # include <errno.h>
 # include <fcntl.h>
+# include <limits.h>
 
 // === VERSION ===
 # define VERSION		"V0.8"
@@ -180,7 +181,7 @@ t_cmd	*parse_command(t_token **current);
 
 // === EXECUTION ===
 // PIPE
-void	close_pipes_fds(t_exec *exec);
+void	close_all_pipes_fds(t_exec *exec);
 void	create_pipes(t_exec *exec);
 void	process_childs(int cmds_index, t_exec *exec, t_cmd *cmds, char ***env);
 void	process_parent(int cmds_index, t_exec *exec);
@@ -189,7 +190,7 @@ void	process_pipeline(t_exec *exec, t_cmd *cmds, char ***env);
 int		count_cmds(t_cmd *cmds);
 void	exec_init(t_exec *exec, t_cmd *cmd);
 void	wait_all_childs(t_exec *exec);
-void	execute_cmds(t_cmd *cmd, char ***env, pid_t pid);
+void	execute_cmds(t_cmd *cmd, char ***env);
 // REDIR
 int		redir_apply_in(t_redir *r);
 int		redir_apply_out(t_redir *r);

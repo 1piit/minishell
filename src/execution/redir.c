@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redir.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 17:13:42 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/10 17:36:00 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/12 15:03:29 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ int	redir_apply_in(t_redir *r)
 	if (fd == -1)
 		return (perror(r->file), -1);
 	dup2(fd, STDIN_FILENO);
+	//bien les proteger les dup2 comme dans le process enfant
 	close(fd);
 	return (0);
 }
