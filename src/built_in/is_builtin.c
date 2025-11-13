@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   is_builtin.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/31 18:58:11 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/31 21:45:46 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/13 17:29:10 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,16 @@ int	is_builtin(char *cmd)
 		|| !ft_strcmp(cmd, "export")
 		|| !ft_strcmp(cmd, "unset")
 		|| !ft_strcmp(cmd, "env")
+		|| !ft_strcmp(cmd, "exit"));
+}
+
+int	is_parent_builtin(char *cmd)
+{
+	if (!cmd)
+		return (0);
+	return (!ft_strcmp(cmd, "cd")
+		|| !ft_strcmp(cmd, "export")
+		|| !ft_strcmp(cmd, "unset")
 		|| !ft_strcmp(cmd, "exit"));
 }
 
