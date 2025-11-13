@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/12 15:08:05 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/12 16:46:34 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,6 +150,9 @@ void	minishell_loop(char ***env);
 char	**init_env(char **envp);
 void	free_env(char **env);
 char	*token_type_to_str(t_tokentype type);
+// === ENV ===
+char	*ft_getenv_shell_level(const char *name, char **env);
+void	shell_level(char ***env);
 
 // === TOKENISATION ===
 void	skip_spaces(const char *line, int *i);
