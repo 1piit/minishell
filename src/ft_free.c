@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 13:33:06 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/10 19:01:36 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/13 13:43:02 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,4 +67,19 @@ void	free_tokens(t_lexer *lx)
 		free(lx->head);
 		lx->head = tmp;
 	}
+}
+
+void	free_tab(char **tab)
+{
+	int	i;
+
+	if (!tab)
+		return ;
+	i = 0;
+	while (tab[i])
+	{
+		free(tab[i]);
+		i++;
+	}
+	free(tab);
 }

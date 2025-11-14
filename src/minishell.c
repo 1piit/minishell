@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 12:27:27 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/10 19:09:42 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/13 18:13:26 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,10 @@ static void	process_line(t_lexer *lx, char *line, char ***env)
 	tokenize(line, lx, *env);
 	cmds = parser(lx);
 	exec_init(&exec, cmds);
-	process_pipeline(&exec, cmds, env);
+	if (exec.nb_cmds > 1 && cmds->next)
+		process_pipeline(&exec, cmds, env);
+	else
+		process_one_cmd(cmds, env);
 	free_tokens(lx);
 	lx->cmds = NULL;
 	lx->head = NULL;

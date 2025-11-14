@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 20:41:13 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/12 15:54:58 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/13 18:09:13 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,40 +17,65 @@ void	exec_init(t_exec *exec, t_cmd *cmd)
 	exec->nb_cmds = count_cmds(cmd);
 	exec->fd_in = 0;
 	exec->fd_out = 0;
-	exec->pipes = malloc((exec->nb_cmds -1) * sizeof(*exec->pipes));
-	if (!exec->pipes)
-		exit(1);
+	if (exec->nb_cmds > 1)
+	{
+		exec->pipes = malloc((exec->nb_cmds -1) * sizeof(*exec->pipes));
+		if (!exec->pipes)
+			exit(1);
+	}
+	else
+		exec->pipes = NULL;
 	exec->pids = malloc(exec->nb_cmds * sizeof(*exec->pids));
 	if (!exec->pids)
 		exit(1);
 }
 
-void	exec_cmds_pid(t_cmd *cmd, char ***env)
+void	execve_cmd(t_cmd *cmd, char ***env)
 {
-	if (ft_strchr(cmd->argv[0], '/'))
+	char		*full_cmd_path;
+
+	if (has_slash(cmd->argv[0]) && is_executable_file(cmd->argv[0]))
 	{
 		execve(cmd->argv[0], cmd->argv, *env);
+		perror(cmd->argv[0]);
+		exit(126);
 	}
-	else
+	full_cmd_path = resolve_cmd(cmd->argv[0]);
+	if (!full_cmd_path)
 	{
-		execvp(cmd->argv[0], cmd->argv);
+		perror(cmd->argv[0]);
+		free(full_cmd_path);
+		exit(127);
 	}
-	printf("Minishell: %s: %s\n", cmd->argv[0], strerror(errno));
-	exit(127);
+	execve(full_cmd_path, cmd->argv, *env);
+	free(full_cmd_path);
+	perror(cmd->argv[0]);
+	exit(126);
 }
 
-void	execute_cmds(t_cmd *cmd, char ***env)
+void	process_one_cmd(t_cmd *cmd, char ***env)
 {
-	if (is_builtin(cmd->argv[0]))
+	pid_t	pid;
+
+	if (is_parent_builtin(cmd->argv[0]))
 	{
 		if (setup_redirections(cmd) == -1)
 			exit(1);
 		g_exit_status = exec_builtin(cmd, env);
-		//dup2(saved_stdout, STDOUT_FILENO);
-		//dup2(saved_stdin, STDIN_FILENO);
-		//close(saved_stdout);
-		//close(saved_stdin);
-		return ;
 	}
-	exec_cmds_pid(cmd, env);
+	else
+	{
+		pid = fork();
+		if (pid == 0)
+		{
+			if (setup_redirections(cmd) == -1)
+				exit(1);
+			if (is_builtin(cmd->argv[0]))
+				g_exit_status = exec_builtin(cmd, env);
+			else
+				execve_cmd(cmd, env);
+		}
+		else
+			wait_child(pid);
+	}
 }

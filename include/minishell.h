@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/12 16:46:34 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/14 16:22:59 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,6 +140,7 @@ int		my_export(char **args, char ***env);
 char	*get_env_value(char **env, const char *var);
 void	add_or_update_env(char ***env, const char *var_value);
 int		unset(char ***env, char **args);
+int		is_parent_builtin(char *cmd);
 int		is_builtin(char *cmd);
 int		exec_builtin(t_cmd *cmd, char ***env);
 int		my_exit(char **argv);
@@ -190,10 +191,16 @@ void	process_childs(int cmds_index, t_exec *exec, t_cmd *cmds, char ***env);
 void	process_parent(int cmds_index, t_exec *exec);
 void	process_pipeline(t_exec *exec, t_cmd *cmds, char ***env);
 // EXEC
+void	process_one_cmd(t_cmd *cmd, char ***env);
+void	pipeline_exit(t_exec *exec, char *err_msg, int exit_code);
+char	*resolve_cmd(char *cmd);
+int		is_executable_file(char *path);
+int		has_slash(char *str);
 int		count_cmds(t_cmd *cmds);
 void	exec_init(t_exec *exec, t_cmd *cmd);
+void	wait_child(pid_t pid);
 void	wait_all_childs(t_exec *exec);
-void	execute_cmds(t_cmd *cmd, char ***env);
+void	execve_cmd(t_cmd *cmd, char ***env);
 // REDIR
 int		redir_apply_in(t_redir *r);
 int		redir_apply_out(t_redir *r);
@@ -205,6 +212,7 @@ void	assert_eq(int value, int expected, char *file, int line);
 void	assert_str_eq(char *value, char *expected, char *file, int line);
 
 // === FREE_UTILS ===
+void	free_tab(char **tab);
 void	free_tokens(t_lexer *lx);
 void	free_all_cmds(t_cmd *cmds);
 void	free_cmd(t_cmd *cmd);
