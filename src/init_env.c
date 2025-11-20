@@ -3,34 +3,35 @@
 /*                                                        :::      ::::::::   */
 /*   init_env.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 15:11:17 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/03 13:37:10 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/20 12:43:00 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	**init_env(char **envp)
+int	init_env(t_shell *sh, char **envp)
 {
 	char	**env;
 	int		i;
 
+	if (!envp)
+		return ;
 	i = 0;
 	while (envp[i])
 		i++;
-	env = malloc(sizeof(char *) * (i + 1));
-	if (!env)
-		return (NULL);
+	sh->env = malloc(sizeof(char *) * (i + 1));
+	if (!sh->env)
+		return (1);
 	i = 0;
 	while (envp[i])
 	{
-		env[i] = ft_strdup(envp[i]);
+		sh->env[i] = ft_strdup(envp[i]);
 		i++;
 	}
-	env[i] = NULL;
-	return (env);
+	sh->env[i] = NULL;
 }
 
 void	free_env_tab(char **env)
@@ -44,18 +45,4 @@ void	free_env_tab(char **env)
 		i++;
 	}
 	free(env);
-}
-
-void	free_env_list(t_env *env)
-{
-	t_env	*tmp;
-
-	while (env)
-	{
-		tmp = env->next;
-		free(env->key);
-		free(env->value);
-		free(env);
-		env = tmp;
-	}
 }
