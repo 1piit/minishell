@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 13:04:30 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/20 13:47:41 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,8 @@
 # define PURPLE_LIGHT	"\001\033[1;35m\002"
 # define WHITE			"\001\033[1;37m\002"
 # define BLACK			"\001\033[30;47m\002"
+
+# define ERR			-1
 
 extern int	g_exit_status;
 
@@ -174,7 +176,7 @@ void	process_parent(int cmds_index, t_exec *exec);
 void	process_pipeline(t_exec *exec, t_cmd *cmds, char ***env);
 // EXEC
 void	command_not_found(char *cmd);
-void	process_one_cmd(t_cmd *cmd, char ***env);
+void	process_single_cmd(t_cmd *cmd, char ***env);
 void	pipeline_exit(t_exec *exec, char *err_msg, int exit_code);
 char	*resolve_cmd(char *cmd);
 int		is_executable_file(char *path);

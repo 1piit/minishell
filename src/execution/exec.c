@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 20:41:13 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/14 14:41:27 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/20 13:52:42 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ void	execve_cmd(t_cmd *cmd, char ***env)
 	exit(126);
 }
 
-void	process_one_cmd(t_cmd *cmd, char ***env)
+void	process_single_cmd(t_cmd *cmd, char ***env)
 {
 	pid_t	pid;
 
