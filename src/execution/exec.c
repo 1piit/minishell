@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 20:41:13 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/13 18:09:13 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/19 21:25:05 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ void	exec_init(t_exec *exec, t_cmd *cmd)
 		exec->pipes = NULL;
 	exec->pids = malloc(exec->nb_cmds * sizeof(*exec->pids));
 	if (!exec->pids)
-		exit(1);
+		return (free(exec->pipes), exit(1));
 }
 
 void	execve_cmd(t_cmd *cmd, char ***env)
@@ -53,7 +53,7 @@ void	execve_cmd(t_cmd *cmd, char ***env)
 	exit(126);
 }
 
-void	process_one_cmd(t_cmd *cmd, char ***env)
+void	process_one_cmd(t_cmd *cmd, char ***env, t_shell *shell)
 {
 	pid_t	pid;
 
@@ -61,7 +61,7 @@ void	process_one_cmd(t_cmd *cmd, char ***env)
 	{
 		if (setup_redirections(cmd) == -1)
 			exit(1);
-		g_exit_status = exec_builtin(cmd, env);
+		shell->exit_status = exec_builtin(cmd, env);
 	}
 	else
 	{
@@ -71,11 +71,11 @@ void	process_one_cmd(t_cmd *cmd, char ***env)
 			if (setup_redirections(cmd) == -1)
 				exit(1);
 			if (is_builtin(cmd->argv[0]))
-				g_exit_status = exec_builtin(cmd, env);
+				shell->exit_status = exec_builtin(cmd, env);
 			else
 				execve_cmd(cmd, env);
 		}
 		else
-			wait_child(pid);
+			wait_child(pid, shell);
 	}
 }

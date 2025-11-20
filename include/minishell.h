@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/14 16:22:59 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/20 16:49:53 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +23,14 @@
 # include <readline/history.h>
 # include <dirent.h>
 # include <sys/stat.h>
+# include <sys/time.h>
 # include <string.h>
 # include <signal.h>
 # include <sys/wait.h>
 # include <errno.h>
 # include <fcntl.h>
 # include <limits.h>
+# include <stdbool.h>
 
 // === VERSION ===
 # define VERSION		"V0.8"
@@ -45,7 +47,7 @@
 # define WHITE			"\001\033[1;37m\002"
 # define BLACK			"\001\033[30;47m\002"
 
-extern int	g_exit_status;
+extern int	g_signal;
 
 typedef struct s_env
 {
@@ -58,6 +60,9 @@ typedef struct s_redir
 {
 	int				type;
 	char			*file;
+	int				h_fd;
+	int				tmp_fd;
+	char			*tmp_file;
 	struct s_redir	*next;
 }	t_redir;
 
@@ -67,6 +72,8 @@ typedef struct s_cmd
 	t_redir			*redir;
 	int				fd_in;
 	int				fd_out;
+	int				pipe_h[2];
+	int				cmd_index;
 	struct s_cmd	*next;
 }	t_cmd;
 
@@ -76,6 +83,9 @@ typedef struct s_shell
 	t_cmd	*cmds;
 	int		last_status;
 	int		running_status;
+	int		stdin_backup;
+	int		stdout_backup;
+	int		exit_status;
 }	t_shell;
 
 typedef enum e_tokentype
@@ -137,23 +147,22 @@ int		pwd(void);
 int		my_env(char **envp);
 int		echo(char **av);
 int		my_export(char **args, char ***env);
-char	*get_env_value(char **env, const char *var);
+char	*get_env_value(char **envp, char *name, int exit_status);
 void	add_or_update_env(char ***env, const char *var_value);
 int		unset(char ***env, char **args);
 int		is_parent_builtin(char *cmd);
 int		is_builtin(char *cmd);
 int		exec_builtin(t_cmd *cmd, char ***env);
-int		my_exit(char **argv);
+int		my_exit(void);
 
 // === MINISHELL ===
 int		main(int ac, char **av, char **envp);
-void	minishell_loop(char ***env);
+void	minishell_loop(char ***env, t_shell *shell);
 char	**init_env(char **envp);
 void	free_env(char **env);
 char	*token_type_to_str(t_tokentype type);
 // === ENV ===
 char	*ft_getenv_shell_level(const char *name, char **env);
-void	shell_level(char ***env);
 
 // === TOKENISATION ===
 void	skip_spaces(const char *line, int *i);
@@ -187,25 +196,28 @@ t_cmd	*parse_command(t_token **current);
 // PIPE
 void	close_all_pipes_fds(t_exec *exec);
 void	create_pipes(t_exec *exec);
-void	process_childs(int cmds_index, t_exec *exec, t_cmd *cmds, char ***env);
+void	process_childs(t_exec *exec, t_cmd *cmds,
+			char ***env, t_shell *shell);
 void	process_parent(int cmds_index, t_exec *exec);
-void	process_pipeline(t_exec *exec, t_cmd *cmds, char ***env);
+void	process_pipeline(t_exec *exec, t_cmd *cmds,
+			char ***env, t_shell *shell);
 // EXEC
-void	process_one_cmd(t_cmd *cmd, char ***env);
+void	process_one_cmd(t_cmd *cmd, char ***env, t_shell *shell);
 void	pipeline_exit(t_exec *exec, char *err_msg, int exit_code);
 char	*resolve_cmd(char *cmd);
 int		is_executable_file(char *path);
 int		has_slash(char *str);
 int		count_cmds(t_cmd *cmds);
 void	exec_init(t_exec *exec, t_cmd *cmd);
-void	wait_child(pid_t pid);
-void	wait_all_childs(t_exec *exec);
+void	wait_child(pid_t pid, t_shell *shell);
+void	wait_all_childs(t_exec *exec, t_shell *shell);
 void	execve_cmd(t_cmd *cmd, char ***env);
 // REDIR
 int		redir_apply_in(t_redir *r);
 int		redir_apply_out(t_redir *r);
 int		apply_append(t_redir *r);
-int		handle_heredoc(t_redir *r);
+// int		prepare_heredocs(t_redir *redir_list);
+int		handle_heredocs(t_redir *redir_list);
 
 // === TEST_UTILS ===
 void	assert_eq(int value, int expected, char *file, int line);
@@ -221,8 +233,12 @@ void	free_env_tab(char **env);
 void	free_env_list(t_env *env);
 
 // === SIGNALS ===
-void	sigint_handler(int signo);
-void	sigquit_handler(int signo);
+void	sigint_handler(int signum);
+void	sigquit_handler(int signum);
+void	setup_signals(void);
+void	heredoc_sigint(int sig);
+void	handler_heredoc(int signum);
+void	cmd_handler(int signum);
 
 // === UTILS ===
 void	print_tokens(t_lexer *lx);

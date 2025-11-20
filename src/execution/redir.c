@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redir.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 17:13:42 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/12 15:03:29 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/19 18:11:53 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,6 @@ int	redir_apply_in(t_redir *r)
 	if (fd == -1)
 		return (perror(r->file), -1);
 	dup2(fd, STDIN_FILENO);
-	//bien les proteger les dup2 comme dans le process enfant
 	close(fd);
 	return (0);
 }
@@ -52,22 +51,38 @@ int	apply_append(t_redir *r)
 	return (0);
 }
 
+int	is_heredoc(t_redir *r)
+{
+	if (dup2(r->tmp_fd, STDIN_FILENO) == -1)
+		return (perror("dup2 heredoc"), -1);
+	close(r->tmp_fd);
+	unlink(r->tmp_file);
+	free(r->tmp_file);
+	return (0);
+}
+
 int	setup_redirections(t_cmd *cmd)
 {
 	t_redir	*r;
 	int		perm_file;
 
+	signal(SIGINT, SIG_IGN);
+	signal(SIGQUIT, SIG_IGN);
+	if (handle_heredocs(cmd->redir) == -1)
+		return (-1);
+	signal(SIGINT, sigint_handler);
+	signal(SIGQUIT, sigquit_handler);
 	r = cmd->redir;
 	while (r)
 	{
-		if (r->type == T_REDIR_IN)
+		if (r->type == T_HEREDOC)
+			perm_file = is_heredoc(r);
+		else if (r->type == T_REDIR_IN)
 			perm_file = redir_apply_in(r);
 		else if (r->type == T_REDIR_OUT)
 			perm_file = redir_apply_out(r);
 		else if (r->type == T_APPEND)
 			perm_file = apply_append(r);
-		else if (r->type == T_HEREDOC)
-			perm_file = handle_heredoc(r);
 		if (perm_file == -1)
 			return (-1);
 		r = r->next;

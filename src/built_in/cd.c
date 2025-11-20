@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:53:28 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/31 21:45:14 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/19 21:37:52 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,10 +69,12 @@ int	cd(char *path, char ***env)
 {
 	char	cwd[4096];
 	char	*home;
+	t_shell	*shell;
 
+	shell = NULL;
 	if (!path || ft_strlen(path) == 0)
 	{
-		home = get_env_value(*env, "HOME");
+		home = get_env_value(*env, "HOME", shell->exit_status);
 		if (!home || ft_strlen(home) == 0)
 			return (fprintf(stderr, "Minishell: cd: HOME not set\n"), 1);
 		path = home;
