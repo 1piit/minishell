@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 16:49:53 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/20 17:29:54 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,14 +47,9 @@
 # define WHITE			"\001\033[1;37m\002"
 # define BLACK			"\001\033[30;47m\002"
 
-extern int	g_signal;
+# define ERR			-1
 
-typedef struct s_env
-{
-	char			*key;
-	char			*value;
-	struct s_env	*next;
-}	t_env;
+extern int	g_signal;
 
 typedef struct s_redir
 {
@@ -76,17 +71,6 @@ typedef struct s_cmd
 	int				cmd_index;
 	struct s_cmd	*next;
 }	t_cmd;
-
-typedef struct s_shell
-{
-	t_env	*env;
-	t_cmd	*cmds;
-	int		last_status;
-	int		running_status;
-	int		stdin_backup;
-	int		stdout_backup;
-	int		exit_status;
-}	t_shell;
 
 typedef enum e_tokentype
 {
@@ -127,19 +111,26 @@ typedef struct s_exec
 	pid_t	*pids;
 }	t_exec;
 
-typedef struct s_expand
-{
-	char	*result;
-	size_t	i;
-	size_t	j;
-}	t_expand;
-
 typedef struct s_heredoc
 {
 	char				*delimiter;
 	char				*content;
 	struct s_heredoc	*next;
 }	t_heredoc;
+
+typedef struct s_shell
+{
+	char		**env;
+	t_lexer		*lx;
+	t_cmd		*cmds_head;
+	t_exec		*exec;
+	t_heredoc	*rdoc;
+	int			last_status;
+	int			running_status;
+	int			stdin_backup;
+	int			stdout_backup;
+	int			exit_status;
+}	t_shell;
 
 // === BUILT-IN ===
 int		cd(char *path, char ***env);
@@ -157,20 +148,17 @@ int		my_exit(void);
 
 // === MINISHELL ===
 int		main(int ac, char **av, char **envp);
-void	minishell_loop(char ***env, t_shell *shell);
-char	**init_env(char **envp);
-void	free_env(char **env);
+void	minishell_loop(t_shell *sh);
+int		init_env(t_shell *sh, char **envp);
 char	*token_type_to_str(t_tokentype type);
-// === ENV ===
-char	*ft_getenv_shell_level(const char *name, char **env);
 
 // === TOKENISATION ===
 void	skip_spaces(const char *line, int *i);
-int		handle_operator(const char *line, int i, t_lexer *lx);
-t_token	*add_token(t_lexer *lx, t_tokentype type, char *word);
+int		handle_operator(t_shell *sh, const char *line, int i);
+t_token	*add_token(t_shell *sh, t_tokentype type, char *word, int is_w_malloc);
 int		is_operator_char(char c);
-int		tokenize_word(const char *line, int *i, t_lexer *lx, char **env);
-t_token	*tokenize(const char *line, t_lexer *lx, char **env);
+int		tokenize_word(t_shell *sh, const char *line, int *i, char **env);
+t_token	*tokenize(t_shell *sh, const char *line, char **env);
 char	*extract_unquoted_part(const char *line, int *i, char **env);
 char	*extract_quoted_part(const char *line, int *i, char **env);
 char	*expand_vars(const char *str, char **env, int expand);
@@ -179,13 +167,13 @@ int		append_part(char **word, char *part);
 int		get_part(const char *line, int *i, char **part, char **env);
 
 // === PARSER ===
-t_cmd	*parser(t_lexer *lx);
+t_cmd	*parser(t_shell *sh);
 int		errmsg(int special_count, t_token *line);
 int		handle_specials(t_token **line);
 void	append_cmd(t_cmd **head, t_cmd **last, t_cmd *cmd);
 int		process_and_append(t_token **line_ptr, t_cmd **head,
 			t_cmd **last);
-t_cmd	*parse_all(t_token **line_ptr);
+t_cmd	*parse_all(t_shell *sh, t_token **line_ptr);
 
 void	parse_redirections(t_token **current, t_cmd *cmd,
 			int special_count, t_token *line);
@@ -202,7 +190,8 @@ void	process_parent(int cmds_index, t_exec *exec);
 void	process_pipeline(t_exec *exec, t_cmd *cmds,
 			char ***env, t_shell *shell);
 // EXEC
-void	process_one_cmd(t_cmd *cmd, char ***env, t_shell *shell);
+void	command_not_found(char *cmd);
+void	process_single_cmd(t_cmd *cmd, char ***env);
 void	pipeline_exit(t_exec *exec, char *err_msg, int exit_code);
 char	*resolve_cmd(char *cmd);
 int		is_executable_file(char *path);
@@ -225,12 +214,11 @@ void	assert_str_eq(char *value, char *expected, char *file, int line);
 
 // === FREE_UTILS ===
 void	free_tab(char **tab);
-void	free_tokens(t_lexer *lx);
+void	free_tokens(t_token *head);
 void	free_all_cmds(t_cmd *cmds);
 void	free_cmd(t_cmd *cmd);
 void	free_redirs(t_redir *redir);
 void	free_env_tab(char **env);
-void	free_env_list(t_env *env);
 
 // === SIGNALS ===
 void	sigint_handler(int signum);
