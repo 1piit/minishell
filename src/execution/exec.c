@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 20:41:13 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 17:35:29 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/20 17:47:02 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ void	process_single_cmd(t_shell *sh, t_cmd *cmd, char ***env)
 	{
 		if (setup_redirections(cmd) == -1)
 			exit(1);
-		sh->exit_status = exec_builtin(cmd, env);
+		sh->exit_status = exec_builtin(sh, cmd, env);
 	}
 	else
 	{
@@ -77,7 +77,7 @@ void	process_single_cmd(t_shell *sh, t_cmd *cmd, char ***env)
 			if (setup_redirections(cmd) == -1)
 				exit(1);
 			if (is_builtin(cmd->argv[0]))
-				sh->exit_status = exec_builtin(cmd, env);
+				sh->exit_status = exec_builtin(sh, cmd, env);
 			else
 				execve_cmd(cmd, env);
 		}

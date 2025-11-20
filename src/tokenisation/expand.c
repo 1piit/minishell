@@ -6,13 +6,13 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:54:05 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 16:52:42 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/20 17:56:12 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	*expand_vars(const char *str, char **env, int expand)
+char	*expand_vars(t_shell *sh, const char *str, int expand)
 {
 	char	buf[4096];
 	int		i;
@@ -28,7 +28,7 @@ char	*expand_vars(const char *str, char **env, int expand)
 	{
 		if (str[i] == '$' && str[i + 1])
 		{
-			copied = copy_var_value(&buf[j], str, &i, env);
+			copied = copy_var_value(sh, &buf[j], str, &i);
 			j += copied;
 		}
 		else
@@ -55,7 +55,7 @@ char	*get_env_value(char **env, const char *var)
 	return ("");
 }*/
 
-char	*get_env_value(char **envp, char *name, int exit_status)
+char	*get_env_value(t_shell *sh, char **envp, char *name)
 {
 	char	*prefix;
 	size_t	len;
@@ -64,7 +64,7 @@ char	*get_env_value(char **envp, char *name, int exit_status)
 	if (!name)
 		return (ft_strdup(""));
 	if (ft_strncmp(name, "?", 2) == 0)
-		return (itoa_status(exit_status));
+		return (ft_itoa(sh->exit_status));
 	len = ft_strlen(name);
 	prefix = ft_strjoin(name, "=");
 	if (!prefix)
@@ -80,19 +80,18 @@ char	*get_env_value(char **envp, char *name, int exit_status)
 	return (ft_strdup(""));
 }
 
-int	copy_var_value(char *dst, const char *src, int *i, char **env)
+int	copy_var_value(t_shell *sh, char *dst, const char *src, int *i)
 {
 	char	name[256];
 	int		n;
 	char	*val;
 	int		len;
-	t_shell	*sh;
 
 	n = 0;
 	(*i)++;
 	if (src[*i] == '?')
 	{
-		val = sh->exit_status;
+		val = ft_itoa(sh->exit_status);
 		len = ft_strlcpy(dst, val, 4096);
 		free(val);
 		(*i)++;
@@ -101,7 +100,7 @@ int	copy_var_value(char *dst, const char *src, int *i, char **env)
 	while (ft_isalnum(src[*i]) || src[*i] == '_')
 		name[n++] = src[(*i)++];
 	name[n] = '\0';
-	val = get_env_value(env, name, sh->exit_status);
+	val = get_env_value(sh, sh->env, name);
 	if (!val)
 		return (0);
 	return (ft_strlcpy(dst, val, 4096));

@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 17:39:33 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/20 18:08:22 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -133,17 +133,17 @@ typedef struct s_shell
 }	t_shell;
 
 // === BUILT-IN ===
-int		cd(char *path, char ***env);
+int		cd(t_shell *sh, char *path, char ***env);
 int		pwd(void);
 int		my_env(char **envp);
 int		echo(char **av);
 int		my_export(char **args, char ***env);
-char	*get_env_value(char **envp, char *name, int exit_status);
+char	*get_env_value(t_shell *sh, char **envp, char *name);
 void	add_or_update_env(char ***env, const char *var_value);
 int		unset(char ***env, char **args);
 int		is_parent_builtin(char *cmd);
 int		is_builtin(char *cmd);
-int		exec_builtin(t_cmd *cmd, char ***env);
+int		exec_builtin(t_shell *sh, t_cmd *cmd, char ***env);
 int		my_exit(void);
 
 // === MINISHELL ===
@@ -159,12 +159,13 @@ t_token	*add_token(t_shell *sh, t_tokentype type, char *word, int is_w_malloc);
 int		is_operator_char(char c);
 int		tokenize_word(t_shell *sh, const char *line, int *i, char **env);
 t_token	*tokenize(t_shell *sh, const char *line, char **env);
-char	*extract_unquoted_part(const char *line, int *i, char **env);
-char	*extract_quoted_part(const char *line, int *i, char **env);
-char	*expand_vars(const char *str, char **env, int expand);
-int		copy_var_value(char *dst, const char *src, int *i, char **env);
+char	*extract_unquoted_part(t_shell *sh, const char *line, int *i,
+			char **env);
+char	*extract_quoted_part(t_shell *sh, const char *line, int *i, char **env);
+char	*expand_vars(t_shell *sh, const char *str, int expand);
+int		copy_var_value(t_shell *sh, char *dst, const char *src, int *i);
 int		append_part(char **word, char *part);
-int		get_part(const char *line, int *i, char **part, char **env);
+int		get_part(t_shell *sh, const char *line, int *i, char **part);
 
 // === PARSER ===
 t_cmd	*parser(t_shell *sh);
@@ -224,8 +225,8 @@ void	free_env_tab(char **env);
 void	sigint_handler(int signum);
 void	sigquit_handler(int signum);
 void	setup_signals(void);
-void	heredoc_sigint(int sig);
 void	handler_heredoc(int signum);
+void	heredoc_sigint(int sig);
 void	cmd_handler(int signum);
 
 // === UTILS ===

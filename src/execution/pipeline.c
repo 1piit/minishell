@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/07 00:07:11 by pbride            #+#    #+#             */
-/*   Updated: 2025/11/20 17:40:07 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/20 17:47:26 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 void	check_builtin(t_shell *sh, t_cmd *cmd, char ***env)
 {
 	if (is_builtin(cmd->argv[0]))
-		sh->exit_status = exec_builtin(cmd, env);
+		sh->exit_status = exec_builtin(sh, cmd, env);
 	else
 		execve_cmd(cmd, env);
 	exit(sh->exit_status);
@@ -63,7 +63,7 @@ void	process_pipeline(t_shell *sh, t_exec *exec, t_cmd *cmd, char ***env)
 		if (exec->pids[cmds_index] == -1)
 			pipeline_exit(exec, "fork", 1);
 		else if (exec->pids[cmds_index] == 0)
-			process_childs(exec, cmd, env, sh);
+			process_childs(sh, exec, cmd, env);
 		else
 			process_parent(cmds_index, exec);
 		cmds_index++;

@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:53:28 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/19 21:37:52 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/20 17:48:26 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ void	update_env_var(char ***env, const char *var, const char *value)
 	free(tmp);
 }
 
-int	cd(char *path, char ***env)
+int	cd(t_shell *sh, char *path, char ***env)
 {
 	char	cwd[4096];
 	char	*home;
@@ -74,7 +74,7 @@ int	cd(char *path, char ***env)
 	shell = NULL;
 	if (!path || ft_strlen(path) == 0)
 	{
-		home = get_env_value(*env, "HOME", shell->exit_status);
+		home = get_env_value(sh, *env, "HOME");
 		if (!home || ft_strlen(home) == 0)
 			return (fprintf(stderr, "Minishell: cd: HOME not set\n"), 1);
 		path = home;

@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 12:27:27 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 17:37:03 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/20 18:11:27 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ void	minishell_loop(t_shell *sh)
 
 	while (1)
 	{
+		setup_signals();
 		line = readline("minishell (" VERSION ") $ ");
 		if (!line)
 		{
