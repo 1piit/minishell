@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 12:27:27 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 17:25:39 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/20 17:37:03 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,10 @@ static void	process_line(t_shell *sh, char *line)
 	if (count_cmds(cmds) > 1 && cmds->next)
 	{
 		exec_init(&exec, cmds);
-		process_pipeline(&exec, cmds, &sh->env);
+		process_pipeline(sh, &exec, cmds, &sh->env);
 	}
 	else if (count_cmds(cmds) == 1 && cmds)
-		process_single_cmd(cmds, &sh->env);
+		process_single_cmd(sh, cmds, &sh->env);
 	free_tokens(sh->lx->head);
 	sh->lx->cmds = NULL;
 	sh->lx->head = NULL;

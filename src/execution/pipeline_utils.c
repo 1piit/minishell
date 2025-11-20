@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 18:17:32 by pbride            #+#    #+#             */
-/*   Updated: 2025/11/20 17:23:21 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/20 17:38:40 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void	close_all_pipes_fds(t_exec *exec)
 	}
 }
 
-void	wait_all_childs(t_exec *exec, t_shell *shell)
+void	wait_all_childs(t_shell *sh, t_exec *exec)
 {
 	int		status;
 	pid_t	pid;
@@ -51,9 +51,9 @@ void	wait_all_childs(t_exec *exec, t_shell *shell)
 		if (pid > 0)
 		{
 			if (WIFEXITED(status))
-				shell->exit_status = WEXITSTATUS(status);
+				sh->exit_status = WEXITSTATUS(status);
 			else
-				shell->exit_status = 1;
+				sh->exit_status = 1;
 		}
 		i++;
 	}

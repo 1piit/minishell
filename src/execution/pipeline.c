@@ -1,27 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipe.c                                             :+:      :+:    :+:   */
+/*   pipeline.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/07 00:07:11 by pbride            #+#    #+#             */
-/*   Updated: 2025/11/19 21:24:02 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/20 17:40:07 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	check_builtin(t_cmd *cmd, char ***env, t_shell *shell)
+void	check_builtin(t_shell *sh, t_cmd *cmd, char ***env)
 {
 	if (is_builtin(cmd->argv[0]))
-		shell->exit_status = exec_builtin(cmd, env);
+		sh->exit_status = exec_builtin(cmd, env);
 	else
 		execve_cmd(cmd, env);
-	exit(shell->exit_status);
+	exit(sh->exit_status);
 }
 
-void	process_childs(t_exec *exec, t_cmd *cmd, char ***env, t_shell *shell)
+void	process_childs(t_shell *sh, t_exec *exec, t_cmd *cmd, char ***env)
 {
 	int	cmds_index;
 
@@ -39,7 +39,7 @@ void	process_childs(t_exec *exec, t_cmd *cmd, char ***env, t_shell *shell)
 	if (setup_redirections(cmd) == -1)
 		pipeline_exit(exec, "redir", 1);
 	close_all_pipes_fds(exec);
-	check_builtin(cmd, env, shell);
+	check_builtin(sh, cmd, env);
 }
 
 void	process_parent(int cmds_index, t_exec *exec)
@@ -50,7 +50,7 @@ void	process_parent(int cmds_index, t_exec *exec)
 		close(exec->pipes[cmds_index][1]);
 }
 
-void	process_pipeline(t_exec *exec, t_cmd *cmd, char ***env, t_shell *shell)
+void	process_pipeline(t_shell *sh, t_exec *exec, t_cmd *cmd, char ***env)
 {
 	int	cmds_index;
 
@@ -63,12 +63,12 @@ void	process_pipeline(t_exec *exec, t_cmd *cmd, char ***env, t_shell *shell)
 		if (exec->pids[cmds_index] == -1)
 			pipeline_exit(exec, "fork", 1);
 		else if (exec->pids[cmds_index] == 0)
-			process_childs(exec, cmd, env, shell);
+			process_childs(exec, cmd, env, sh);
 		else
 			process_parent(cmds_index, exec);
 		cmds_index++;
 		cmd = cmd->next;
 	}
 	close_all_pipes_fds(exec);
-	wait_all_childs(exec, shell);
+	wait_all_childs(sh, exec);
 }

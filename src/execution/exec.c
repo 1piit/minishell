@@ -6,21 +6,21 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 20:41:13 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 17:24:02 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/20 17:35:29 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	wait_child(pid_t pid)
+void	wait_child(t_shell *sh, pid_t pid)
 {
 	int	status;
 
 	waitpid(pid, &status, 0);
 	if (WIFEXITED(status))
-		g_exit_status = WEXITSTATUS(status);
+		sh->exit_status = WEXITSTATUS(status);
 	else
-		g_exit_status = 1;
+		sh->exit_status = 1;
 }
 
 void	exec_init(t_exec *exec, t_cmd *cmd)
@@ -59,7 +59,7 @@ void	execve_cmd(t_cmd *cmd, char ***env)
 	exit(126);
 }
 
-void	process_single_cmd(t_cmd *cmd, char ***env)
+void	process_single_cmd(t_shell *sh, t_cmd *cmd, char ***env)
 {
 	pid_t	pid;
 
@@ -67,7 +67,7 @@ void	process_single_cmd(t_cmd *cmd, char ***env)
 	{
 		if (setup_redirections(cmd) == -1)
 			exit(1);
-		shell->exit_status = exec_builtin(cmd, env);
+		sh->exit_status = exec_builtin(cmd, env);
 	}
 	else
 	{
@@ -77,11 +77,11 @@ void	process_single_cmd(t_cmd *cmd, char ***env)
 			if (setup_redirections(cmd) == -1)
 				exit(1);
 			if (is_builtin(cmd->argv[0]))
-				shell->exit_status = exec_builtin(cmd, env);
+				sh->exit_status = exec_builtin(cmd, env);
 			else
 				execve_cmd(cmd, env);
 		}
 		else
-			wait_child(pid, shell);
+			wait_child(sh, pid);
 	}
 }

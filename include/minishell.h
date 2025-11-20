@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 17:29:54 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/20 17:39:33 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -184,22 +184,22 @@ t_cmd	*parse_command(t_token **current);
 // PIPE
 void	close_all_pipes_fds(t_exec *exec);
 void	create_pipes(t_exec *exec);
-void	process_childs(t_exec *exec, t_cmd *cmds,
-			char ***env, t_shell *shell);
+void	process_childs(t_shell *sh, t_exec *exec, t_cmd *cmds,
+			char ***env);
 void	process_parent(int cmds_index, t_exec *exec);
-void	process_pipeline(t_exec *exec, t_cmd *cmds,
-			char ***env, t_shell *shell);
+void	process_pipeline(t_shell *sh, t_exec *exec, t_cmd *cmds,
+			char ***env);
 // EXEC
 void	command_not_found(char *cmd);
-void	process_single_cmd(t_cmd *cmd, char ***env);
+void	process_single_cmd(t_shell *sh, t_cmd *cmd, char ***env);
 void	pipeline_exit(t_exec *exec, char *err_msg, int exit_code);
 char	*resolve_cmd(char *cmd);
 int		is_executable_file(char *path);
 int		has_slash(char *str);
 int		count_cmds(t_cmd *cmds);
 void	exec_init(t_exec *exec, t_cmd *cmd);
-void	wait_child(pid_t pid, t_shell *shell);
-void	wait_all_childs(t_exec *exec, t_shell *shell);
+void	wait_child(t_shell *sh, pid_t pid);
+void	wait_all_childs(t_shell *sh, t_exec *exec);
 void	execve_cmd(t_cmd *cmd, char ***env);
 // REDIR
 int		redir_apply_in(t_redir *r);
