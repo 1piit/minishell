@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 12:27:27 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 13:54:03 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/20 16:22:27 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,8 @@ static void	process_line(t_shell *sh, char *line)
 	sh->lx = ft_calloc(1, sizeof(t_lexer));
 	if (!sh->lx)
 		printf("fonction: exit_all + free_all");
-	tokenize(line, sh->lx, sh->env);
-	cmds = parser(sh->lx);
+	tokenize(sh, line, sh->env);
+	cmds = parser(sh);
 	if (count_cmds(cmds) > 1 && cmds->next)
 	{
 		exec_init(&exec, cmds);

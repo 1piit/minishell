@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tokenisation.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:54:10 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/29 17:53:42 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/20 16:13:33 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ char	*extract_unquoted_part(const char *line, int *i, char **env)
 	return (expanded);
 }
 
-t_token	*tokenize(const char *line, t_lexer *lx, char **env)
+t_token	*tokenize(t_shell *sh, const char *line, char **env)
 {
 	int	i;
 	int	op_len;
@@ -70,34 +70,40 @@ t_token	*tokenize(const char *line, t_lexer *lx, char **env)
 		skip_spaces(line, &i);
 		if (!line[i])
 			break ;
-		op_len = handle_operator(line, i, lx);
+		op_len = handle_operator(sh, line, i);
 		if (op_len > 0)
 		{
 			i += op_len;
 			continue ;
 		}
-		tokenize_word(line, &i, lx, env);
+		tokenize_word(sh, line, &i, env);
 	}
-	return (lx->head);
+	return (sh->lx->head);
 }
 
-int	tokenize_word(const char *line, int *i, t_lexer *lx, char **env)
+int	tokenize_word(t_shell *sh, const char *line, int *i, char **env)
 {
 	char	*part;
 	char	*word;
 
-	word = ft_strdup("");
+	word = ft_calloc(1, sizeof(char));
+	if (!word)
+	{
+		printf("fonction: exit_all + free_all");
+		return (1);
+	}
 	while (line[*i] && line[*i] != ' ' && !is_operator_char(line[*i]))
 	{
 		if (get_part(line, i, &part, env) != 0)
 		{
 			free(word);
+			printf("fonction: exit_all + free_all");
 			return (1);
 		}
 		if (append_part(&word, part) != 0)
-			return (1);
+			return (printf("fonction: exit_all + free_all"), 1);
 	}
-	add_token(lx, T_WORD, word);
+	add_token(sh, T_WORD, word, 1);
 	free(word);
 	return (0);
 }

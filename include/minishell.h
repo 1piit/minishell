@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 13:47:41 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/20 16:34:34 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,6 +115,7 @@ typedef struct s_shell
 {
 	char		**env;
 	t_lexer		*lx;
+	t_cmd		*cmds_head;
 	t_exec		*exec;
 	t_heredoc	*rdoc;
 }	t_shell;
@@ -141,11 +142,11 @@ char	*token_type_to_str(t_tokentype type);
 
 // === TOKENISATION ===
 void	skip_spaces(const char *line, int *i);
-int		handle_operator(const char *line, int i, t_lexer *lx);
-t_token	*add_token(t_lexer *lx, t_tokentype type, char *word);
+int		handle_operator(t_shell *sh, const char *line, int i);
+t_token	*add_token(t_shell *sh, t_tokentype type, char *word, int is_w_malloc);
 int		is_operator_char(char c);
-int		tokenize_word(const char *line, int *i, t_lexer *lx, char **env);
-t_token	*tokenize(const char *line, t_lexer *lx, char **env);
+int		tokenize_word(t_shell *sh, const char *line, int *i, char **env);
+t_token	*tokenize(t_shell *sh, const char *line, char **env);
 char	*extract_unquoted_part(const char *line, int *i, char **env);
 char	*extract_quoted_part(const char *line, int *i, char **env);
 char	*expand_vars(const char *str, char **env, int expand);
@@ -154,13 +155,13 @@ int		append_part(char **word, char *part);
 int		get_part(const char *line, int *i, char **part, char **env);
 
 // === PARSER ===
-t_cmd	*parser(t_lexer *lx);
+t_cmd	*parser(t_shell *sh);
 int		errmsg(int special_count, t_token *line);
 int		handle_specials(t_token **line);
 void	append_cmd(t_cmd **head, t_cmd **last, t_cmd *cmd);
 int		process_and_append(t_token **line_ptr, t_cmd **head,
 			t_cmd **last);
-t_cmd	*parse_all(t_token **line_ptr);
+t_cmd	*parse_all(t_shell *sh, t_token **line_ptr);
 
 void	parse_redirections(t_token **current, t_cmd *cmd,
 			int special_count, t_token *line);

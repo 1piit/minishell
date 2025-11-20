@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:39:17 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 13:30:47 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/20 16:17:14 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ int	main(int argc, char **argv, char **envp)
 	signal(SIGINT, sigint_handler);
 	signal(SIGQUIT, SIG_IGN);
 	minishell_loop(&sh);
-	//free_env_tab(env);
+	free_env_tab(sh.env);
 	clear_history();
 	printf("exit\n");
 	return (g_exit_status);
