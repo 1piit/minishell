@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 16:25:44 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 18:08:29 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/20 23:00:07 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 void	sigint_handler(int signum)
 {
 	(void)signum;
-	g_signal = 1;
+	g_signal = SIGINT;
 	write(STDOUT_FILENO, "\n", 1);
 	rl_on_new_line();
 	rl_replace_line("", 0);

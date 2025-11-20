@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 18:08:22 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/20 22:17:24 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,8 +206,10 @@ void	execve_cmd(t_cmd *cmd, char ***env);
 int		redir_apply_in(t_redir *r);
 int		redir_apply_out(t_redir *r);
 int		apply_append(t_redir *r);
-// int		prepare_heredocs(t_redir *redir_list);
-int		handle_heredocs(t_redir *redir_list);
+int		handle_heredocs(t_redir *r);
+/* helper: run_heredoc_child is internal to heredoc.c */
+// int		run_heredoc_child(t_redir *r, int pipe_end);
+int		has_heredoc(t_redir *r);
 
 // === TEST_UTILS ===
 void	assert_eq(int value, int expected, char *file, int line);

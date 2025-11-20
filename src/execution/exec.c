@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 20:41:13 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 17:47:02 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/20 22:21:03 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,10 @@ void	execve_cmd(t_cmd *cmd, char ***env)
 void	process_single_cmd(t_shell *sh, t_cmd *cmd, char ***env)
 {
 	pid_t	pid;
+
+	if (cmd->redir)
+		if (handle_heredocs(cmd->redir) == -1)
+			return ;
 
 	if (is_parent_builtin(cmd->argv[0]))
 	{

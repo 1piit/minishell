@@ -6,13 +6,13 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/07 00:07:11 by pbride            #+#    #+#             */
-/*   Updated: 2025/11/20 17:47:26 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/20 23:00:28 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	check_builtin(t_shell *sh, t_cmd *cmd, char ***env)
+static void	run_cmd(t_shell *sh, t_cmd *cmd, char ***env)
 {
 	if (is_builtin(cmd->argv[0]))
 		sh->exit_status = exec_builtin(sh, cmd, env);
@@ -23,7 +23,7 @@ void	check_builtin(t_shell *sh, t_cmd *cmd, char ***env)
 
 void	process_childs(t_shell *sh, t_exec *exec, t_cmd *cmd, char ***env)
 {
-	int	cmds_index;
+	int		cmds_index;
 
 	cmds_index = cmd->cmd_index;
 	if (cmds_index > 0)
@@ -39,7 +39,7 @@ void	process_childs(t_shell *sh, t_exec *exec, t_cmd *cmd, char ***env)
 	if (setup_redirections(cmd) == -1)
 		pipeline_exit(exec, "redir", 1);
 	close_all_pipes_fds(exec);
-	check_builtin(sh, cmd, env);
+	run_cmd(sh, cmd, env);
 }
 
 void	process_parent(int cmds_index, t_exec *exec)
@@ -52,8 +52,17 @@ void	process_parent(int cmds_index, t_exec *exec)
 
 void	process_pipeline(t_shell *sh, t_exec *exec, t_cmd *cmd, char ***env)
 {
-	int	cmds_index;
+	int		cmds_index;
+	t_cmd	*tmp;
 
+	tmp = cmd;
+	while (tmp)
+	{
+		if (tmp->redir)
+			if (handle_heredocs(tmp->redir) == -1)
+				return ;
+		tmp = tmp->next;
+	}
 	create_pipes(exec);
 	cmds_index = 0;
 	while (cmd && cmds_index < exec->nb_cmds)

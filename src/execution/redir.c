@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 17:13:42 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/19 18:11:53 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/20 20:19:25 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,9 +55,6 @@ int	is_heredoc(t_redir *r)
 {
 	if (dup2(r->tmp_fd, STDIN_FILENO) == -1)
 		return (perror("dup2 heredoc"), -1);
-	close(r->tmp_fd);
-	unlink(r->tmp_file);
-	free(r->tmp_file);
 	return (0);
 }
 
@@ -66,15 +63,10 @@ int	setup_redirections(t_cmd *cmd)
 	t_redir	*r;
 	int		perm_file;
 
-	signal(SIGINT, SIG_IGN);
-	signal(SIGQUIT, SIG_IGN);
-	if (handle_heredocs(cmd->redir) == -1)
-		return (-1);
-	signal(SIGINT, sigint_handler);
-	signal(SIGQUIT, sigquit_handler);
 	r = cmd->redir;
 	while (r)
 	{
+		perm_file = 0;
 		if (r->type == T_HEREDOC)
 			perm_file = is_heredoc(r);
 		else if (r->type == T_REDIR_IN)
