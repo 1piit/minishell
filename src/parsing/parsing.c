@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 19:20:39 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 16:40:20 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/20 18:15:02 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,7 @@ t_cmd	*parse_all(t_shell *sh, t_token **line_ptr)
 	line = *line_ptr;
 	head = NULL;
 	last = NULL;
-	sh->cmds_head = &head;
+	sh->cmds_head = head;
 	while (line)
 	{
 		special_count = 0;
