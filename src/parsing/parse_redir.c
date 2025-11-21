@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 15:42:06 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/10 18:37:12 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/21 19:40:42 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@ static t_redir	*create_redir(t_token *tok)
 		return (NULL);
 	new->type = tok->type;
 	new->file = ft_strdup(tok->next->word);
+	if (!new->file)
+		return (free_null(new), NULL);
 	new->next = NULL;
 	return (new);
 }
@@ -35,29 +37,39 @@ static int	process_redir_entry(t_token **current, t_cmd *cmd,
 	tok = *current;
 	if (!(tok->type == T_REDIR_IN || tok->type == T_REDIR_OUT
 			|| tok->type == T_APPEND || tok->type == T_HEREDOC))
-		return (0);
+		return (REDIR_NOT_A_REDIR);
 	if (!tok->next || tok->next->type != T_WORD)
 	{
 		errmsg(special_count, line);
-		return (0);
+		return (REDIR_ERR_SYNTAX);
 	}
 	new = create_redir(tok);
 	if (!new)
-		return (0);
+		return (REDIR_ERR_ALLOC);
 	redir_list = &cmd->redir;
 	while (*redir_list)
 		redir_list = &(*redir_list)->next;
 	*redir_list = new;
 	*current = tok->next->next;
-	return (1);
+	return (REDIR_OK);
 }
 
-void	parse_redirections(t_token **current, t_cmd *cmd,
+int	parse_redirections(t_token **current, t_cmd *cmd,
 				int special_count, t_token *line)
 {
+	int	redir_status;
+
 	while (*current)
 	{
-		if (process_redir_entry(current, cmd, special_count, line) == 0)
+		redir_status = process_redir_entry(current, cmd, special_count, line);
+		if (redir_status == REDIR_NOT_A_REDIR)
 			break ;
+		else if (redir_status == REDIR_ERR_SYNTAX)
+			return (REDIR_ERR_SYNTAX);
+		else if (redir_status == REDIR_ERR_ALLOC)
+			return (REDIR_ERR_ALLOC);
+		else if (redir_status == REDIR_OK)
+			continue ;
 	}
+	return (REDIR_OK);
 }

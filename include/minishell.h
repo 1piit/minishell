@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 22:17:24 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/21 19:39:42 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,19 @@ typedef enum e_tokentype
 	T_END
 }	t_tokentype;
 
+typedef enum e_redir_status
+{
+	REDIR_NOT_A_REDIR = 0,
+	REDIR_OK = 1,
+	REDIR_ERR_SYNTAX = -1,
+	REDIR_ERR_ALLOC = -2
+}	t_redir_status;
+
+typedef enum e_err_status
+{
+	ERR_ALLOC = -2
+}	t_err_status;
+
 typedef struct s_token
 {
 	t_tokentype		type;
@@ -159,9 +172,8 @@ t_token	*add_token(t_shell *sh, t_tokentype type, char *word, int is_w_malloc);
 int		is_operator_char(char c);
 int		tokenize_word(t_shell *sh, const char *line, int *i, char **env);
 t_token	*tokenize(t_shell *sh, const char *line, char **env);
-char	*extract_unquoted_part(t_shell *sh, const char *line, int *i,
-			char **env);
-char	*extract_quoted_part(t_shell *sh, const char *line, int *i, char **env);
+char	*extract_unquoted_part(t_shell *sh, const char *line, int *i);
+char	*extract_quoted_part(t_shell *sh, const char *line, int *i);
 char	*expand_vars(t_shell *sh, const char *str, int expand);
 int		copy_var_value(t_shell *sh, char *dst, const char *src, int *i);
 int		append_part(char **word, char *part);
@@ -172,11 +184,11 @@ t_cmd	*parser(t_shell *sh);
 int		errmsg(int special_count, t_token *line);
 int		handle_specials(t_token **line);
 void	append_cmd(t_cmd **head, t_cmd **last, t_cmd *cmd);
-int		process_and_append(t_token **line_ptr, t_cmd **head,
+void	process_and_append(t_shell *sh, t_token **line_ptr, t_cmd **head,
 			t_cmd **last);
 t_cmd	*parse_all(t_shell *sh, t_token **line_ptr);
 
-void	parse_redirections(t_token **current, t_cmd *cmd,
+int		parse_redirections(t_token **current, t_cmd *cmd,
 			int special_count, t_token *line);
 int		setup_redirections(t_cmd *cmd);
 t_cmd	*parse_command(t_token **current);
@@ -184,7 +196,7 @@ t_cmd	*parse_command(t_token **current);
 // === EXECUTION ===
 // PIPE
 void	close_all_pipes_fds(t_exec *exec);
-void	create_pipes(t_exec *exec);
+void	create_pipes(t_shell *sh, t_exec *exec);
 void	process_childs(t_shell *sh, t_exec *exec, t_cmd *cmds,
 			char ***env);
 void	process_parent(int cmds_index, t_exec *exec);
@@ -198,7 +210,7 @@ char	*resolve_cmd(char *cmd);
 int		is_executable_file(char *path);
 int		has_slash(char *str);
 int		count_cmds(t_cmd *cmds);
-void	exec_init(t_exec *exec, t_cmd *cmd);
+int		exec_init(t_exec *exec, t_cmd *cmd);
 void	wait_child(t_shell *sh, pid_t pid);
 void	wait_all_childs(t_shell *sh, t_exec *exec);
 void	execve_cmd(t_cmd *cmd, char ***env);
@@ -216,12 +228,17 @@ void	assert_eq(int value, int expected, char *file, int line);
 void	assert_str_eq(char *value, char *expected, char *file, int line);
 
 // === FREE_UTILS ===
+void	free_null(void *p);
 void	free_tab(char **tab);
 void	free_tokens(t_token *head);
-void	free_all_cmds(t_cmd *cmds);
 void	free_cmd(t_cmd *cmd);
 void	free_redirs(t_redir *redir);
-void	free_env_tab(char **env);
+void	free_exit_sh(t_shell *sh, char *mess, int code_exit);
+// FREE SHELL
+void	free_lx_sh(t_lexer *lx);
+void	free_cmds_sh(t_cmd *cmd);
+void	free_exec_sh(t_exec *exec);
+void	free_rdocs_sh(t_heredoc *rdoc);
 
 // === SIGNALS ===
 void	sigint_handler(int signum);

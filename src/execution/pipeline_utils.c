@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   pipeline_utils.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 18:17:32 by pbride            #+#    #+#             */
-/*   Updated: 2025/11/20 17:38:40 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/21 18:17:09 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	create_pipes(t_exec *exec)
+void	create_pipes(t_shell *sh, t_exec *exec)
 {
 	int	i;
 
@@ -20,7 +20,10 @@ void	create_pipes(t_exec *exec)
 	while (i < exec->nb_cmds - 1)
 	{
 		if (pipe(exec->pipes[i]) == -1)
-			pipeline_exit(exec, "pipe", 1);
+		{
+			close_all_pipes_fds(exec);
+			free_exit_sh(sh, "pipe", 1);
+		}
 		i++;
 	}
 }

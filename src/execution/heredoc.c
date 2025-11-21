@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 17:15:13 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 23:00:07 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/21 19:40:17 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,12 @@ static void	run_heredoc_child(t_redir *r, int write_fd)
 		line = readline("> ");
 		if (!line || ft_strcmp(line, r->file) == 0)
 		{
-			free(line);
+			free_null(line);
 			break ;
 		}
 		write(write_fd, line, ft_strlen(line));
 		write(write_fd, "\n", 1);
-		free(line);
+		free_null(line);
 	}
 	close(write_fd);
 	exit(0);

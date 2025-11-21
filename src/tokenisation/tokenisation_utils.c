@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   tokenisation_utils.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 12:34:45 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 17:59:45 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/21 19:41:34 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,12 +59,12 @@ int	append_part(char **word, char *part)
 	temp = ft_strjoin(*word, part);
 	if (!temp)
 	{
-		free(*word);
-		free(part);
+		free_null(*word);
+		free_null(part);
 		return (1);
 	}
-	free(*word);
-	free(part);
+	free_null(*word);
+	free_null(part);
 	*word = temp;
 	return (0);
 }
@@ -72,9 +72,9 @@ int	append_part(char **word, char *part)
 int	get_part(t_shell *sh, const char *line, int *i, char **part)
 {
 	if (line[*i] == '\'' || line[*i] == '"')
-		*part = extract_quoted_part(sh, line, i, sh->env);
+		*part = extract_quoted_part(sh, line, i);
 	else
-		*part = extract_unquoted_part(sh, line, i, sh->env);
+		*part = extract_unquoted_part(sh, line, i);
 	if (!*part)
 		return (1);
 	return (0);

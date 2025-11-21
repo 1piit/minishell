@@ -3,22 +3,35 @@
 /*                                                        :::      ::::::::   */
 /*   pipeline.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/07 00:07:11 by pbride            #+#    #+#             */
-/*   Updated: 2025/11/20 23:00:28 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/21 18:19:16 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static void	run_cmd(t_shell *sh, t_cmd *cmd, char ***env)
+//static void	run_cmd(t_shell *sh, t_cmd *cmd, char ***env)
+//{
+//	if (is_builtin(cmd->argv[0]))
+//		sh->exit_status = exec_builtin(sh, cmd, env);
+//	else
+//		execve_cmd(cmd, env);
+//	exit(sh->exit_status);
+//}
+void	process_rdocs(t_cmd *cmd)
 {
-	if (is_builtin(cmd->argv[0]))
-		sh->exit_status = exec_builtin(sh, cmd, env);
-	else
-		execve_cmd(cmd, env);
-	exit(sh->exit_status);
+	t_cmd	*tmp;
+
+	tmp = cmd;
+	while (tmp)
+	{
+		if (tmp->redir)
+			if (handle_heredocs(tmp->redir) == -1)
+				return ;
+		tmp = tmp->next;
+	}
 }
 
 void	process_childs(t_shell *sh, t_exec *exec, t_cmd *cmd, char ***env)
@@ -39,7 +52,11 @@ void	process_childs(t_shell *sh, t_exec *exec, t_cmd *cmd, char ***env)
 	if (setup_redirections(cmd) == -1)
 		pipeline_exit(exec, "redir", 1);
 	close_all_pipes_fds(exec);
-	run_cmd(sh, cmd, env);
+	if (is_builtin(cmd->argv[0]))
+		sh->exit_status = exec_builtin(sh, cmd, env);
+	else
+		execve_cmd(cmd, env);
+	exit(sh->exit_status);
 }
 
 void	process_parent(int cmds_index, t_exec *exec)
@@ -53,18 +70,11 @@ void	process_parent(int cmds_index, t_exec *exec)
 void	process_pipeline(t_shell *sh, t_exec *exec, t_cmd *cmd, char ***env)
 {
 	int		cmds_index;
-	t_cmd	*tmp;
 
-	tmp = cmd;
-	while (tmp)
-	{
-		if (tmp->redir)
-			if (handle_heredocs(tmp->redir) == -1)
-				return ;
-		tmp = tmp->next;
-	}
-	create_pipes(exec);
+	process_rdocs(cmd);
+	create_pipes(sh, exec);
 	cmds_index = 0;
+	//j'en suis ici
 	while (cmd && cmds_index < exec->nb_cmds)
 	{
 		cmd->cmd_index = cmds_index;

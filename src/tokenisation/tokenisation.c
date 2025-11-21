@@ -3,23 +3,22 @@
 /*                                                        :::      ::::::::   */
 /*   tokenisation.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:54:10 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 18:01:01 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/21 19:41:47 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	*extract_quoted_part(t_shell *sh, const char *line, int *i, char **env)
+char	*extract_quoted_part(t_shell *sh, const char *line, int *i)
 {
 	char	quote;
 	char	*part;
 	char	*expanded;
 	int		start;
 
-	(void)env;
 	quote = line[*i];
 	(*i)++;
 	start = *i;
@@ -35,20 +34,19 @@ char	*extract_quoted_part(t_shell *sh, const char *line, int *i, char **env)
 	if (quote == '"')
 	{
 		expanded = expand_vars(sh, part, 1);
-		free(part);
-		return (expanded);
+		if (!expanded)
+			return (free_null(part), NULL);
+		return (free_null(part), expanded);
 	}
 	return (part);
 }
 
-char	*extract_unquoted_part(t_shell *sh, const char *line, int *i,
-	char **env)
+char	*extract_unquoted_part(t_shell *sh, const char *line, int *i)
 {
 	int		start;
 	char	*raw;
 	char	*expanded;
 
-	(void)env;
 	start = *i;
 	while (line[*i] && line[*i] != ' '
 		&& !is_operator_char(line[*i])
@@ -58,8 +56,9 @@ char	*extract_unquoted_part(t_shell *sh, const char *line, int *i,
 	if (!raw)
 		return (NULL);
 	expanded = expand_vars(sh, raw, 1);
-	free(raw);
-	return (expanded);
+	if (!expanded)
+		return (free_null(raw), NULL);
+	return (free_null(raw), expanded);
 }
 
 t_token	*tokenize(t_shell *sh, const char *line, char **env)
@@ -92,22 +91,18 @@ int	tokenize_word(t_shell *sh, const char *line, int *i, char **env)
 	(void)env;
 	word = ft_calloc(1, sizeof(char));
 	if (!word)
-	{
-		printf("fonction: exit_all + free_all");
-		return (1);
-	}
+		free_exit_sh(sh, "calloc", 1);
 	while (line[*i] && line[*i] != ' ' && !is_operator_char(line[*i]))
 	{
 		if (get_part(sh, line, i, &part) != 0)
 		{
-			free(word);
-			printf("fonction: exit_all + free_all");
-			return (1);
+			free_null(word);
+			free_exit_sh(sh, "malloc", 1);
 		}
 		if (append_part(&word, part) != 0)
-			return (printf("fonction: exit_all + free_all"), 1);
+			free_exit_sh(sh, "malloc", 1);
 	}
 	add_token(sh, T_WORD, word, 1);
-	free(word);
+	free_null(word);
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 17:50:00 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 16:14:51 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/21 19:41:10 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,14 +35,13 @@ t_token	*add_token(t_shell *sh, t_tokentype type, char *word, int is_w_malloc)
 
 	new = malloc(sizeof(t_token));
 	if (!new)
-		return (NULL);
+		free_exit_sh(sh, "malloc", 1);
 	if (set_token_props(new, type, word) != 0)
 	{
-		free(new);
+		free_null(new);
 		if (is_w_malloc)
-			free(word);
-		printf("fonction: exit_all + free_all");
-		return (NULL);
+			free_null(word);
+		free_exit_sh(sh, "malloc", 1);
 	}
 	new->next = NULL;
 	if (sh->lx->head == NULL)

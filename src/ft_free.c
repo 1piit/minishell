@@ -6,11 +6,20 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 13:33:06 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 13:03:52 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/21 19:35:45 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+void	free_null(void *p)
+{
+	if (p)
+	{
+		free(p);
+		p = NULL;
+	}
+}
 
 void	free_redirs(t_redir *redir)
 {
@@ -20,8 +29,8 @@ void	free_redirs(t_redir *redir)
 	{
 		tmp = redir->next;
 		if (redir->file)
-			free(redir->file);
-		free(redir);
+			free_null(redir->file);
+		free_null(redir);
 		redir = tmp;
 	}
 }
@@ -36,24 +45,11 @@ void	free_cmd(t_cmd *cmd)
 	{
 		i = 0;
 		while (cmd->argv[i])
-			free(cmd->argv[i++]);
-		free(cmd->argv);
+			free_null(cmd->argv[i++]);
+		free_null(cmd->argv);
 	}
 	free_redirs(cmd->redir);
-	free(cmd);
-}
-
-void	free_all_cmds(t_cmd *cmds)
-{
-	t_cmd	*tmp;
-
-	tmp = NULL;
-	while (cmds)
-	{
-		tmp = cmds->next;
-		free_cmd(cmds);
-		cmds = tmp;
-	}
+	free_null(cmd);
 }
 
 void	free_tokens(t_token *head)
@@ -63,8 +59,8 @@ void	free_tokens(t_token *head)
 	while (head)
 	{
 		tmp = head->next;
-		free(head->word);
-		free(head);
+		free_null(head->word);
+		free_null(head);
 		head = tmp;
 	}
 }
@@ -78,8 +74,8 @@ void	free_tab(char **tab)
 	i = 0;
 	while (tab[i])
 	{
-		free(tab[i]);
+		free_null(tab[i]);
 		i++;
 	}
-	free(tab);
+	free_null(tab);
 }

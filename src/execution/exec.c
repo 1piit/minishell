@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 20:41:13 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 22:21:03 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/21 19:37:41 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,17 +23,18 @@ void	wait_child(t_shell *sh, pid_t pid)
 		sh->exit_status = 1;
 }
 
-void	exec_init(t_exec *exec, t_cmd *cmd)
+int	exec_init(t_exec *exec, t_cmd *cmd)
 {
 	exec->nb_cmds = count_cmds(cmd);
 	exec->fd_in = 0;
 	exec->fd_out = 0;
 	exec->pipes = malloc((exec->nb_cmds -1) * sizeof(*exec->pipes));
 	if (!exec->pipes)
-		exit(1);
+		return (ERR_ALLOC);
 	exec->pids = malloc(exec->nb_cmds * sizeof(*exec->pids));
 	if (!exec->pids)
-		return (free(exec->pipes), exit(1));
+		return (free_null(exec->pipes), ERR_ALLOC);
+	return (0);
 }
 
 void	execve_cmd(t_cmd *cmd, char ***env)
@@ -50,11 +51,11 @@ void	execve_cmd(t_cmd *cmd, char ***env)
 	if (!full_cmd_path)
 	{
 		command_not_found(cmd->argv[0]);
-		free(full_cmd_path);
+		free_null(full_cmd_path);
 		exit(127);
 	}
 	execve(full_cmd_path, cmd->argv, *env);
-	free(full_cmd_path);
+	free_null(full_cmd_path);
 	perror(cmd->argv[0]);
 	exit(126);
 }

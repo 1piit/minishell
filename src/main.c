@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:39:17 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 18:11:20 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/21 19:36:14 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ int	main(int argc, char **argv, char **envp)
 		return (1);
 	g_signal = 0;
 	minishell_loop(&sh);
-	free_env_tab(sh.env);
+	free_tab(sh.env);
 	clear_history();
 	printf("exit\n");
 	return (g_signal);

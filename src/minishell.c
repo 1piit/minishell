@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 12:27:27 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 23:00:07 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/21 19:36:50 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,15 +19,16 @@ static void	process_line(t_shell *sh, char *line)
 
 	sh->lx = ft_calloc(1, sizeof(t_lexer));
 	if (!sh->lx)
-		printf("fonction: exit_all + free_all");
+		free_exit_sh(sh, "calloc", 1);
 	tokenize(sh, line, sh->env);
 	cmds = parser(sh);
-	if (count_cmds(cmds) > 1 && cmds->next)
+	if (cmds && count_cmds(cmds) > 1 && cmds->next)
 	{
-		exec_init(&exec, cmds);
+		if (exec_init(&exec, cmds) == ERR_ALLOC)
+			free_exit_sh(sh, "malloc", 1);
 		process_pipeline(sh, &exec, cmds, &sh->env);
 	}
-	else if (count_cmds(cmds) == 1 && cmds)
+	else if (cmds && count_cmds(cmds) == 1)
 		process_single_cmd(sh, cmds, &sh->env);
 	free_tokens(sh->lx->head);
 	sh->lx->cmds = NULL;
@@ -44,13 +45,12 @@ void	minishell_loop(t_shell *sh)
 		line = readline("minishell (" VERSION ") $ ");
 		if (!line)
 		{
-			printf("exit\n");
 			rl_clear_history();
-			exit(0);
+			free_exit_sh(sh, "exit", 0);
 		}
 		if (g_signal == SIGINT)
 		{
-			free(line);
+			free_null(line);
 			g_signal = 0;
 			continue ;
 		}
@@ -60,6 +60,6 @@ void	minishell_loop(t_shell *sh)
 		free_tokens(sh->lx->head);
 		free_cmd(sh->lx->cmds);
 		line[0] = '\0';
-		free(line);
+		free_null(line);
 	}
 }

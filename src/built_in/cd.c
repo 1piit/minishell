@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:53:28 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/21 12:40:19 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/21 19:37:05 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,12 +30,12 @@ void	add_or_update_env(char ***env, const char *var_value)
 	while (i < len)
 	{
 		new_env[i] = ft_strdup((*env)[i]);
-		free((*env)[i]);
+		free_null((*env)[i]);
 		i++;
 	}
 	new_env[i++] = ft_strdup(var_value);
 	new_env[i] = NULL;
-	free(*env);
+	free_null(*env);
 	*env = new_env;
 }
 
@@ -47,22 +47,22 @@ void	update_env_var(char ***env, const char *var, const char *value)
 
 	var_eq = ft_strjoin(var, "=");
 	tmp = ft_strjoin(var_eq, value);
-	free(var_eq);
+	free_null(var_eq);
 	idx = 0;
 	while ((*env)[idx])
 	{
 		if (ft_strncmp((*env)[idx], var, ft_strlen(var)) == 0
 			&& (*env)[idx][ft_strlen(var)] == '=')
 		{
-			free((*env)[idx]);
+			free_null((*env)[idx]);
 			(*env)[idx] = ft_strdup(tmp);
-			free(tmp);
+			free_null(tmp);
 			return ;
 		}
 		idx++;
 	}
 	add_or_update_env(env, tmp);
-	free(tmp);
+	free_null(tmp);
 }
 
 int	cd(t_shell *sh, char *path, char ***env)

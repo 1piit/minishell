@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   unset.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/10 17:18:46 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/31 21:46:25 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/21 19:37:20 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ static void	unset_var2(char **env, char *var, char **new_env)
 			new_env[j] = ft_strdup(env[i]);
 			j++;
 		}
-		free(env[i]);
+		free_null(env[i]);
 		i++;
 	}
 	new_env[j] = NULL;
@@ -48,7 +48,7 @@ static void	unset_var(char ***env, char *var)
 	if (!new_env)
 		return ;
 	unset_var2(*env, var, new_env);
-	free(*env);
+	free_null(*env);
 	*env = new_env;
 }
 
