@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 17:15:13 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/21 18:22:26 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/21 21:01:38 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,8 +20,6 @@ static void	run_heredoc_child(t_redir *r, int write_fd)
 
 	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_IGN);
-	/* allow readline in the child to install its handlers so it properly
-	   manages terminal attributes while reading the heredoc */
 	rl_catch_signals = 1;
 	rl_clear_history();
 	while (1)
@@ -76,6 +74,8 @@ int	handle_heredoc(t_redir *r)
 		return (close(fd[0]), -1);
 	if (WIFEXITED(status) && WEXITSTATUS(status) == 130)
 		return (close(fd[0]), -1);
+	if (r->tmp_fd > 0)
+		close(r->tmp_fd);
 	r->tmp_fd = fd[0];
 	return (0);
 }

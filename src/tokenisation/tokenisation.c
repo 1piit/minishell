@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:54:10 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 18:01:01 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/21 20:19:19 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,8 @@ char	*extract_quoted_part(t_shell *sh, const char *line, int *i, char **env)
 	while (line[*i] && line[*i] != quote)
 		(*i)++;
 	if (!line[*i])
-		return (fprintf(stderr, "syntax error: unclosed quote\n"), NULL);
+		return (write(STDERR_FILENO, "syntax error: unclosed"
+				"quote\n", 29), NULL);
 	part = ft_substr(line, start, *i - start);
 	if (!part)
 		return (NULL);

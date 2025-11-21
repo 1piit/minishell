@@ -6,32 +6,29 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 15:11:17 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/21 18:59:21 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/21 20:19:53 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include <pwd.h>
-#include <sys/types.h>
+/* platform libc calls avoided to reduce undefined symbols */
 
 int	init_env(t_shell *sh, char **envp)
 {
 	int		i;
 	char	*val;
-	struct passwd *pw;
 
-	/* If envp is NULL or empty (e.g. `env -i ./minishell`), create a
-	   minimal environment with HOME and SHLVL=1 so builtins like `cd`
-	   behave reasonably. */
 	if (!envp || !envp[0])
 	{
-		pw = getpwuid(getuid());
+		/* Prefer existing HOME from environment variables; if not
+		   present we fallback to root to keep `cd` usable. */
+		char *home = getenv("HOME");
 		sh->env = malloc(sizeof(char *) * 3);
 		if (!sh->env)
 			return (ERR);
-		if (pw && pw->pw_dir)
+		if (home && ft_strlen(home) > 0)
 		{
-			val = ft_strjoin("HOME=", pw->pw_dir);
+			val = ft_strjoin("HOME=", home);
 			sh->env[0] = val ? val : ft_strdup("HOME=/");
 		}
 		else
@@ -54,15 +51,11 @@ int	init_env(t_shell *sh, char **envp)
 	}
 	sh->env[i] = NULL;
 
-	/* Ensure HOME exists: if not present, try to use passwd entry. */
 	val = get_env_value(sh, sh->env, "HOME");
 	if (!val || ft_strlen(val) == 0)
 	{
-		pw = getpwuid(getuid());
-		if (pw && pw->pw_dir)
-			update_env_var(&sh->env, "HOME", pw->pw_dir);
-		else
-			update_env_var(&sh->env, "HOME", "/");
+		/* Fallback: if HOME isn't present, set to root */
+		update_env_var(&sh->env, "HOME", "/");
 	}
 	free(val);
 

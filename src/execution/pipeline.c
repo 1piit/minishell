@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/07 00:07:11 by pbride            #+#    #+#             */
-/*   Updated: 2025/11/21 18:22:26 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/21 22:07:42 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,8 @@ static void	run_cmd(t_shell *sh, t_cmd *cmd, char ***env)
 
 void	process_childs(t_shell *sh, t_exec *exec, t_cmd *cmd, char ***env)
 {
-	int		cmds_index;
-
-	/* child should have default signal dispositions */
-	struct sigaction sa;
+	int					cmds_index;
+	struct sigaction	sa;
 
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;

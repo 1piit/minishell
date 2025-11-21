@@ -6,17 +6,52 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 19:20:39 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/21 18:35:14 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/21 22:27:53 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+void	free_command(t_cmd *cmd)
+{
+	int		i;
+	t_redir	*r;
+	t_redir	*tmp;
+
+	i = 0;
+	if (!cmd)
+		return ;
+	if (cmd->argv)
+	{
+		while (cmd->argv[i])
+		{
+			free(cmd->argv[i]);
+			i++;
+		}
+		free(cmd->argv);
+	}
+	r = cmd->redir;
+	while (r)
+	{
+		tmp = r->next;
+		free(r->file);
+		if (r->tmp_file)
+			free(r->tmp_file);
+		if (r->tmp_fd)
+			close(r->tmp_fd);
+		free(r);
+		r = tmp;
+	}
+	free(cmd);
+}
+
 t_cmd	*parse_command(t_token **current)
 {
 	t_cmd	*cmd;
 	int		argc;
+	int		i;
 
+	i = 0;
 	cmd = malloc(sizeof(t_cmd));
 	if (!cmd)
 		return (NULL);
@@ -31,6 +66,17 @@ t_cmd	*parse_command(t_token **current)
 	while (*current && (*current)->type == T_WORD)
 	{
 		cmd->argv[argc] = ft_strdup((*current)->word);
+		if (!cmd->argv[argc])
+		{
+			while (i < argc)
+			{
+				free(cmd->argv[i]);
+				i++;
+			}
+			free(cmd->argv);
+			free(cmd);
+			return (NULL);
+		}
 		argc++;
 		*current = (*current)->next;
 	}
@@ -85,7 +131,8 @@ int	process_and_append(t_token **line_ptr, t_cmd **head,
 	cmd = parse_command(&current);
 	if (!cmd)
 		return (1);
-	parse_redirections(&current, cmd, 0, *line_ptr);
+	if (parse_redirections(&current, cmd, 0, *line_ptr))
+		return (free_command(cmd), 1);
 	append_cmd(head, last, cmd);
 	*line_ptr = current;
 	return (0);

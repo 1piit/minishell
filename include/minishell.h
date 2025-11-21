@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/21 18:59:21 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/21 22:25:09 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,6 +132,7 @@ typedef struct s_shell
 	int				stdout_backup;
 	int				exit_status;
 	struct termios	g_saved_term;
+	char			**g_env;
 }	t_shell;
 
 // === BUILT-IN ===
@@ -154,6 +155,7 @@ int		main(int ac, char **av, char **envp);
 void	minishell_loop(t_shell *sh);
 int		init_env(t_shell *sh, char **envp);
 char	*token_type_to_str(t_tokentype type);
+void	exec_destroy(t_exec *exec);
 
 // === TOKENISATION ===
 void	skip_spaces(const char *line, int *i);
@@ -179,7 +181,7 @@ int		process_and_append(t_token **line_ptr, t_cmd **head,
 			t_cmd **last);
 t_cmd	*parse_all(t_shell *sh, t_token **line_ptr);
 
-void	parse_redirections(t_token **current, t_cmd *cmd,
+int		parse_redirections(t_token **current, t_cmd *cmd,
 			int special_count, t_token *line);
 int		setup_redirections(t_cmd *cmd);
 t_cmd	*parse_command(t_token **current);
@@ -225,6 +227,13 @@ void	free_all_cmds(t_cmd *cmds);
 void	free_cmd(t_cmd *cmd);
 void	free_redirs(t_redir *redir);
 void	free_env_tab(char **env);
+void	free_lx_sh(t_lexer *lx);
+void	free_cmds_sh(t_cmd *cmd);
+void	free_exec_sh(t_exec *exec);
+void	free_rdocs_sh(t_heredoc *rdoc);
+void	free_exit_sh(t_shell *sh);
+void	free_command(t_cmd *cmd);
+void	free_tokens_2(t_token *head);
 
 // === SIGNALS ===
 void	sigint_handler(int signum);

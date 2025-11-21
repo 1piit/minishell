@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 20:41:13 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/21 18:59:21 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/21 20:46:40 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,11 +67,6 @@ void	process_single_cmd(t_shell *sh, t_cmd *cmd, char ***env)
 	if (cmd->redir)
 		if (handle_heredocs(cmd->redir) == -1)
 			return ;
-
-	/* If there is no command (argv[0] == NULL) but there are redirections
-	   (e.g. a bare heredoc like `<< DELIM`), consume/close heredoc fds and
-	   do not attempt to fork/exec. This matches shell behavior where a
-	   redirection-only simple_command performs no external command. */
 	if (!cmd->argv || !cmd->argv[0])
 	{
 		t_redir *r = cmd->redir;

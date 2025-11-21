@@ -3,14 +3,21 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/04 14:10:24 by pbride            #+#    #+#             */
-/*   Updated: 2025/11/05 14:12:16 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/21 20:49:01 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+void	exec_destroy(t_exec *exec)
+{
+	free(exec->pipes);
+	free(exec->pids);
+}
+
 
 void	print_tokens(t_lexer *lx)
 {
