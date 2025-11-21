@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   exit.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/31 20:01:42 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/18 19:42:20 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/21 20:56:56 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <minishell.h>
 
-int	my_exit(void)
+void	my_exit(t_shell *sh)
 {
-	exit(1);
+	free_exit_sh(sh, "exit", 0);
 }

@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 15:42:06 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/21 19:40:42 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/21 21:04:32 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ static t_redir	*create_redir(t_token *tok)
 	new->type = tok->type;
 	new->file = ft_strdup(tok->next->word);
 	if (!new->file)
-		return (free_null(new), NULL);
+		return (free_null((void **)&new), NULL);
 	new->next = NULL;
 	return (new);
 }

@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 12:34:45 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/21 19:41:34 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/21 21:04:32 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,12 +59,12 @@ int	append_part(char **word, char *part)
 	temp = ft_strjoin(*word, part);
 	if (!temp)
 	{
-		free_null(*word);
-		free_null(part);
+		free_null((void **)word);
+		free_null((void **)&part);
 		return (1);
 	}
-	free_null(*word);
-	free_null(part);
+	free_null((void **)word);
+	free_null((void **)&part);
 	*word = temp;
 	return (0);
 }

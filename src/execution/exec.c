@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 20:41:13 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/21 19:37:41 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/21 22:17:33 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ int	exec_init(t_exec *exec, t_cmd *cmd)
 		return (ERR_ALLOC);
 	exec->pids = malloc(exec->nb_cmds * sizeof(*exec->pids));
 	if (!exec->pids)
-		return (free_null(exec->pipes), ERR_ALLOC);
+		return (free_null((void **)&exec->pipes), ERR_ALLOC);
 	return (0);
 }
 
@@ -51,11 +51,11 @@ void	execve_cmd(t_cmd *cmd, char ***env)
 	if (!full_cmd_path)
 	{
 		command_not_found(cmd->argv[0]);
-		free_null(full_cmd_path);
+		free_null((void **)&full_cmd_path);
 		exit(127);
 	}
 	execve(full_cmd_path, cmd->argv, *env);
-	free_null(full_cmd_path);
+	free_null((void **)&full_cmd_path);
 	perror(cmd->argv[0]);
 	exit(126);
 }

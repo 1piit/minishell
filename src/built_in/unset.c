@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/10 17:18:46 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/21 19:37:20 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/21 21:04:32 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ static void	unset_var2(char **env, char *var, char **new_env)
 			new_env[j] = ft_strdup(env[i]);
 			j++;
 		}
-		free_null(env[i]);
+		free_null((void **)&env[i]);
 		i++;
 	}
 	new_env[j] = NULL;
@@ -48,7 +48,7 @@ static void	unset_var(char ***env, char *var)
 	if (!new_env)
 		return ;
 	unset_var2(*env, var, new_env);
-	free_null(*env);
+	free_null((void **)env);
 	*env = new_env;
 }
 

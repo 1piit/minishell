@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 19:20:39 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/21 19:47:20 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/21 22:18:00 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ t_cmd	*parse_command(t_token **current)
 		return (NULL);
 	cmd->argv = malloc(sizeof(char *) * 1024);
 	if (!cmd->argv)
-		return (free_null(cmd), NULL);
+		return (free_null((void **)&cmd), NULL);
 	cmd->redir = NULL;
 	cmd->fd_in = STDIN_FILENO;
 	cmd->fd_out = STDOUT_FILENO;
@@ -53,9 +53,15 @@ void	process_and_append(t_shell *sh, t_token **line_ptr, t_cmd **head,
 		free_exit_sh(sh, "malloc", 1);
 	redir_status = parse_redirections(&current, cmd, 0, *line_ptr);
 	if (redir_status == REDIR_ERR_SYNTAX)
+	{
+		free_cmd(cmd);
 		free_exit_sh(sh, "", 1);
+	}
 	else if (redir_status == REDIR_ERR_ALLOC)
+	{
+		free_cmd(cmd);
 		free_exit_sh(sh, "malloc", 1);
+	}
 	append_cmd(head, last, cmd);
 	*line_ptr = current;
 }
@@ -70,7 +76,6 @@ t_cmd	*parse_all(t_shell *sh, t_token **line_ptr)
 	line = *line_ptr;
 	head = NULL;
 	last = NULL;
-	//sh->cmds_head = head;
 	while (line)
 	{
 		special_count = 0;

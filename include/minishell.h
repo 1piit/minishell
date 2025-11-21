@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/21 19:39:42 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/21 22:18:00 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,7 +157,7 @@ int		unset(char ***env, char **args);
 int		is_parent_builtin(char *cmd);
 int		is_builtin(char *cmd);
 int		exec_builtin(t_shell *sh, t_cmd *cmd, char ***env);
-int		my_exit(void);
+void	my_exit(t_shell *sh);
 
 // === MINISHELL ===
 int		main(int ac, char **av, char **envp);
@@ -228,17 +228,17 @@ void	assert_eq(int value, int expected, char *file, int line);
 void	assert_str_eq(char *value, char *expected, char *file, int line);
 
 // === FREE_UTILS ===
-void	free_null(void *p);
+void	free_null(void **p);
 void	free_tab(char **tab);
 void	free_tokens(t_token *head);
 void	free_cmd(t_cmd *cmd);
 void	free_redirs(t_redir *redir);
 void	free_exit_sh(t_shell *sh, char *mess, int code_exit);
 // FREE SHELL
-void	free_lx_sh(t_lexer *lx);
-void	free_cmds_sh(t_cmd *cmd);
-void	free_exec_sh(t_exec *exec);
-void	free_rdocs_sh(t_heredoc *rdoc);
+void	free_lx_sh(t_lexer **lx);
+void	free_cmds_sh(t_cmd **cmd);
+void	free_exec_sh(t_exec **exec);
+void	free_rdocs_sh(t_heredoc **rdoc);
 
 // === SIGNALS ===
 void	sigint_handler(int signum);

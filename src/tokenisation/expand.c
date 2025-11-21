@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:54:05 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/21 19:41:22 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/21 21:04:32 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,10 +73,10 @@ char	*get_env_value(t_shell *sh, char **envp, char *name)
 	while (envp && envp[i])
 	{
 		if (ft_strncmp(envp[i], prefix, len + 1) == 0)
-			return (free_null(prefix), ft_strdup(envp[i] + len + 1));
+			return (free_null((void **)&prefix), ft_strdup(envp[i] + len + 1));
 		i++;
 	}
-	free_null(prefix);
+	free_null((void **)&prefix);
 	return (ft_strdup(""));
 }
 
@@ -93,7 +93,7 @@ int	copy_var_value(t_shell *sh, char *dst, const char *src, int *i)
 	{
 		val = ft_itoa(sh->exit_status);
 		len = ft_strlcpy(dst, val, 4096);
-		free_null(val);
+		free_null((void **)&val);
 		(*i)++;
 		return (len);
 	}
