@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parsing.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 19:20:39 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/10 18:48:38 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/20 17:42:13 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,16 +38,18 @@ t_cmd	*parse_command(t_token **current)
 	return (cmd);
 }
 
-t_cmd	*parse_all(t_token **line_ptr)
+t_cmd	*parse_all(t_shell *sh, t_token **line_ptr)
 {
 	t_token	*line;
 	t_cmd	*head;
 	t_cmd	*last;
 	int		special_count;
 
+	(void)sh;
 	line = *line_ptr;
 	head = NULL;
 	last = NULL;
+	sh->cmds_head = head;
 	while (line)
 	{
 		special_count = 0;
@@ -81,10 +83,10 @@ int	process_and_append(t_token **line_ptr, t_cmd **head,
 	return (0);
 }
 
-t_cmd	*parser(t_lexer *lx)
+t_cmd	*parser(t_shell *sh)
 {
 	t_token	*line;
 
-	line = lx->head;
-	return (parse_all(&line));
+	line = sh->lx->head;
+	return (parse_all(sh, &line));
 }

@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 13:33:06 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/13 13:43:02 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/20 13:03:52 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,16 +56,16 @@ void	free_all_cmds(t_cmd *cmds)
 	}
 }
 
-void	free_tokens(t_lexer *lx)
+void	free_tokens(t_token *head)
 {
 	t_token	*tmp;
 
-	while (lx->head)
+	while (head)
 	{
-		tmp = lx->head->next;
-		free(lx->head->word);
-		free(lx->head);
-		lx->head = tmp;
+		tmp = head->next;
+		free(head->word);
+		free(head);
+		head = tmp;
 	}
 }
 

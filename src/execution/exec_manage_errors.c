@@ -1,31 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   env.c                                              :+:      :+:    :+:   */
+/*   exec_manage_errors.c                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/29 16:53:40 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 23:01:26 by rgalmich         ###   ########.fr       */
+/*   Created: 2025/11/14 14:34:12 by pbride            #+#    #+#             */
+/*   Updated: 2025/11/19 17:53:52 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	my_env(char **envp)
+void	command_not_found(char *cmd)
 {
-	int	i;
-
-	if (!envp)
-	{
-		fprintf(stderr, "env: no environment found\n");
-		return (1);
-	}
-	i = 0;
-	while (envp[i])
-	{
-		printf("%s\n", envp[i]);
-		i++;
-	}
-	return (0);
+	write(2, "minishell: ", 11);
+	write(2, cmd, ft_strlen(cmd));
+	write(2, ": command not found\n", 21);
 }

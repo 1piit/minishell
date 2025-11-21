@@ -3,58 +3,62 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 12:27:27 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/13 18:13:26 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/20 23:00:07 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	lexer_init(t_lexer *lx)
-{
-	lx->head = NULL;
-	lx->last = NULL;
-	lx->j = 0;
-	lx->word[0] = '\0';
-	lx->quote = 0;
-	lx->cmds = NULL;
-}
-
-static void	process_line(t_lexer *lx, char *line, char ***env)
+static void	process_line(t_shell *sh, char *line)
 {
 	t_cmd	*cmds;
 	t_exec	exec;
 
-	lexer_init(lx);
-	tokenize(line, lx, *env);
-	cmds = parser(lx);
-	exec_init(&exec, cmds);
-	if (exec.nb_cmds > 1 && cmds->next)
-		process_pipeline(&exec, cmds, env);
-	else
-		process_one_cmd(cmds, env);
-	free_tokens(lx);
-	lx->cmds = NULL;
-	lx->head = NULL;
+	sh->lx = ft_calloc(1, sizeof(t_lexer));
+	if (!sh->lx)
+		printf("fonction: exit_all + free_all");
+	tokenize(sh, line, sh->env);
+	cmds = parser(sh);
+	if (count_cmds(cmds) > 1 && cmds->next)
+	{
+		exec_init(&exec, cmds);
+		process_pipeline(sh, &exec, cmds, &sh->env);
+	}
+	else if (count_cmds(cmds) == 1 && cmds)
+		process_single_cmd(sh, cmds, &sh->env);
+	free_tokens(sh->lx->head);
+	sh->lx->cmds = NULL;
+	sh->lx->head = NULL;
 }
 
-void	minishell_loop(char ***env)
+void	minishell_loop(t_shell *sh)
 {
-	t_lexer	lx;
 	char	*line;
 
+	setup_signals();
 	while (1)
 	{
 		line = readline("minishell (" VERSION ") $ ");
 		if (!line)
-			break ;
+		{
+			printf("exit\n");
+			rl_clear_history();
+			exit(0);
+		}
+		if (g_signal == SIGINT)
+		{
+			free(line);
+			g_signal = 0;
+			continue ;
+		}
 		if (*line)
 			add_history(line);
-		process_line(&lx, line, env);
-		free_tokens(&lx);
-		free_cmd(lx.cmds);
+		process_line(sh, line);
+		free_tokens(sh->lx->head);
+		free_cmd(sh->lx->cmds);
 		line[0] = '\0';
 		free(line);
 	}

@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 12:34:45 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/29 17:56:06 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/20 17:59:45 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,30 +25,30 @@ void	skip_spaces(const char *line, int *i)
 		(*i)++;
 }
 
-int	handle_operator(const char *line, int i, t_lexer *lx)
+int	handle_operator(t_shell *sh, const char *line, int i)
 {
 	if (line[i] == '>' && line[i + 1] == '>')
 	{
-		add_token(lx, T_APPEND, ">>");
+		add_token(sh, T_APPEND, ">>", 0);
 		return (2);
 	}
 	if (line[i] == '<' && line[i + 1] == '<')
 	{
-		add_token(lx, T_HEREDOC, "<<");
+		add_token(sh, T_HEREDOC, "<<", 0);
 		return (2);
 	}
 	if (line[i] == '>')
 	{
-		add_token(lx, T_REDIR_OUT, ">");
+		add_token(sh, T_REDIR_OUT, ">", 0);
 		return (1);
 	}
 	if (line[i] == '<')
 	{
-		add_token(lx, T_REDIR_IN, "<");
+		add_token(sh, T_REDIR_IN, "<", 0);
 		return (1);
 	}
 	if (line[i] == '|')
-		return (add_token(lx, T_PIPE, "|"), 1);
+		return (add_token(sh, T_PIPE, "|", 0), 1);
 	return (0);
 }
 
@@ -69,12 +69,12 @@ int	append_part(char **word, char *part)
 	return (0);
 }
 
-int	get_part(const char *line, int *i, char **part, char **env)
+int	get_part(t_shell *sh, const char *line, int *i, char **part)
 {
 	if (line[*i] == '\'' || line[*i] == '"')
-		*part = extract_quoted_part(line, i, env);
+		*part = extract_quoted_part(sh, line, i, sh->env);
 	else
-		*part = extract_unquoted_part(line, i, env);
+		*part = extract_unquoted_part(sh, line, i, sh->env);
 	if (!*part)
 		return (1);
 	return (0);

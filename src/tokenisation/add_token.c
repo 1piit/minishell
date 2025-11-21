@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   add_token.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
+/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 17:50:00 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/03 17:09:04 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/20 16:14:51 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ static int	set_token_props(t_token *new, t_tokentype type, char *word)
 	return (0);
 }
 
-t_token	*add_token(t_lexer *lx, t_tokentype type, char *word)
+t_token	*add_token(t_shell *sh, t_tokentype type, char *word, int is_w_malloc)
 {
 	t_token	*new;
 
@@ -39,13 +39,16 @@ t_token	*add_token(t_lexer *lx, t_tokentype type, char *word)
 	if (set_token_props(new, type, word) != 0)
 	{
 		free(new);
+		if (is_w_malloc)
+			free(word);
+		printf("fonction: exit_all + free_all");
 		return (NULL);
 	}
 	new->next = NULL;
-	if (lx->head == NULL)
-		lx->head = new;
+	if (sh->lx->head == NULL)
+		sh->lx->head = new;
 	else
-		(lx->last)->next = new;
-	lx->last = new;
+		(sh->lx->last)->next = new;
+	sh->lx->last = new;
 	return (new);
 }

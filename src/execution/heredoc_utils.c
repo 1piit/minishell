@@ -1,31 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   env.c                                              :+:      :+:    :+:   */
+/*   heredoc_utils.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/29 16:53:40 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 23:01:26 by rgalmich         ###   ########.fr       */
+/*   Created: 2025/11/20 20:38:20 by rgalmich          #+#    #+#             */
+/*   Updated: 2025/11/20 22:50:49 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	my_env(char **envp)
+int	has_heredoc(t_redir *r)
 {
-	int	i;
-
-	if (!envp)
+	while (r)
 	{
-		fprintf(stderr, "env: no environment found\n");
-		return (1);
-	}
-	i = 0;
-	while (envp[i])
-	{
-		printf("%s\n", envp[i]);
-		i++;
+		if (r->type == T_HEREDOC)
+			return (1);
+		r = r->next;
 	}
 	return (0);
+}
+
+void	heredoc_sigint(int sig)
+{
+	(void)sig;
+	write(1, "\n", 1);
+	rl_replace_line("", 0);
+	rl_done = 1;
 }
