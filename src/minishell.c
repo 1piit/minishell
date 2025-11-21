@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 12:27:27 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 16:22:27 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/20 23:00:07 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,10 @@ static void	process_line(t_shell *sh, char *line)
 	if (count_cmds(cmds) > 1 && cmds->next)
 	{
 		exec_init(&exec, cmds);
-		process_pipeline(&exec, cmds, &sh->env);
+		process_pipeline(sh, &exec, cmds, &sh->env);
 	}
 	else if (count_cmds(cmds) == 1 && cmds)
-		process_single_cmd(cmds, &sh->env);
+		process_single_cmd(sh, cmds, &sh->env);
 	free_tokens(sh->lx->head);
 	sh->lx->cmds = NULL;
 	sh->lx->head = NULL;
@@ -38,11 +38,22 @@ void	minishell_loop(t_shell *sh)
 {
 	char	*line;
 
+	setup_signals();
 	while (1)
 	{
 		line = readline("minishell (" VERSION ") $ ");
 		if (!line)
-			break ;
+		{
+			printf("exit\n");
+			rl_clear_history();
+			exit(0);
+		}
+		if (g_signal == SIGINT)
+		{
+			free(line);
+			g_signal = 0;
+			continue ;
+		}
 		if (*line)
 			add_history(line);
 		process_line(sh, line);

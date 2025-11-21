@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 16:34:34 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/20 22:17:24 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +23,14 @@
 # include <readline/history.h>
 # include <dirent.h>
 # include <sys/stat.h>
+# include <sys/time.h>
 # include <string.h>
 # include <signal.h>
 # include <sys/wait.h>
 # include <errno.h>
 # include <fcntl.h>
 # include <limits.h>
+# include <stdbool.h>
 
 // === VERSION ===
 # define VERSION		"V0.8"
@@ -47,12 +49,15 @@
 
 # define ERR			-1
 
-extern int	g_exit_status;
+extern int	g_signal;
 
 typedef struct s_redir
 {
 	int				type;
 	char			*file;
+	int				h_fd;
+	int				tmp_fd;
+	char			*tmp_file;
 	struct s_redir	*next;
 }	t_redir;
 
@@ -62,6 +67,8 @@ typedef struct s_cmd
 	t_redir			*redir;
 	int				fd_in;
 	int				fd_out;
+	int				pipe_h[2];
+	int				cmd_index;
 	struct s_cmd	*next;
 }	t_cmd;
 
@@ -118,21 +125,26 @@ typedef struct s_shell
 	t_cmd		*cmds_head;
 	t_exec		*exec;
 	t_heredoc	*rdoc;
+	int			last_status;
+	int			running_status;
+	int			stdin_backup;
+	int			stdout_backup;
+	int			exit_status;
 }	t_shell;
 
 // === BUILT-IN ===
-int		cd(char *path, char ***env);
+int		cd(t_shell *sh, char *path, char ***env);
 int		pwd(void);
 int		my_env(char **envp);
 int		echo(char **av);
 int		my_export(char **args, char ***env);
-char	*get_env_value(char **env, const char *var);
+char	*get_env_value(t_shell *sh, char **envp, char *name);
 void	add_or_update_env(char ***env, const char *var_value);
 int		unset(char ***env, char **args);
 int		is_parent_builtin(char *cmd);
 int		is_builtin(char *cmd);
-int		exec_builtin(t_cmd *cmd, char ***env);
-int		my_exit(char **argv);
+int		exec_builtin(t_shell *sh, t_cmd *cmd, char ***env);
+int		my_exit(void);
 
 // === MINISHELL ===
 int		main(int ac, char **av, char **envp);
@@ -147,12 +159,13 @@ t_token	*add_token(t_shell *sh, t_tokentype type, char *word, int is_w_malloc);
 int		is_operator_char(char c);
 int		tokenize_word(t_shell *sh, const char *line, int *i, char **env);
 t_token	*tokenize(t_shell *sh, const char *line, char **env);
-char	*extract_unquoted_part(const char *line, int *i, char **env);
-char	*extract_quoted_part(const char *line, int *i, char **env);
-char	*expand_vars(const char *str, char **env, int expand);
-int		copy_var_value(char *dst, const char *src, int *i, char **env);
+char	*extract_unquoted_part(t_shell *sh, const char *line, int *i,
+			char **env);
+char	*extract_quoted_part(t_shell *sh, const char *line, int *i, char **env);
+char	*expand_vars(t_shell *sh, const char *str, int expand);
+int		copy_var_value(t_shell *sh, char *dst, const char *src, int *i);
 int		append_part(char **word, char *part);
-int		get_part(const char *line, int *i, char **part, char **env);
+int		get_part(t_shell *sh, const char *line, int *i, char **part);
 
 // === PARSER ===
 t_cmd	*parser(t_shell *sh);
@@ -172,26 +185,31 @@ t_cmd	*parse_command(t_token **current);
 // PIPE
 void	close_all_pipes_fds(t_exec *exec);
 void	create_pipes(t_exec *exec);
-void	process_childs(int cmds_index, t_exec *exec, t_cmd *cmds, char ***env);
+void	process_childs(t_shell *sh, t_exec *exec, t_cmd *cmds,
+			char ***env);
 void	process_parent(int cmds_index, t_exec *exec);
-void	process_pipeline(t_exec *exec, t_cmd *cmds, char ***env);
+void	process_pipeline(t_shell *sh, t_exec *exec, t_cmd *cmds,
+			char ***env);
 // EXEC
 void	command_not_found(char *cmd);
-void	process_single_cmd(t_cmd *cmd, char ***env);
+void	process_single_cmd(t_shell *sh, t_cmd *cmd, char ***env);
 void	pipeline_exit(t_exec *exec, char *err_msg, int exit_code);
 char	*resolve_cmd(char *cmd);
 int		is_executable_file(char *path);
 int		has_slash(char *str);
 int		count_cmds(t_cmd *cmds);
 void	exec_init(t_exec *exec, t_cmd *cmd);
-void	wait_child(pid_t pid);
-void	wait_all_childs(t_exec *exec);
+void	wait_child(t_shell *sh, pid_t pid);
+void	wait_all_childs(t_shell *sh, t_exec *exec);
 void	execve_cmd(t_cmd *cmd, char ***env);
 // REDIR
 int		redir_apply_in(t_redir *r);
 int		redir_apply_out(t_redir *r);
 int		apply_append(t_redir *r);
-int		handle_heredoc(t_redir *r);
+int		handle_heredocs(t_redir *r);
+/* helper: run_heredoc_child is internal to heredoc.c */
+// int		run_heredoc_child(t_redir *r, int pipe_end);
+int		has_heredoc(t_redir *r);
 
 // === TEST_UTILS ===
 void	assert_eq(int value, int expected, char *file, int line);
@@ -206,8 +224,12 @@ void	free_redirs(t_redir *redir);
 void	free_env_tab(char **env);
 
 // === SIGNALS ===
-void	sigint_handler(int signo);
-void	sigquit_handler(int signo);
+void	sigint_handler(int signum);
+void	sigquit_handler(int signum);
+void	setup_signals(void);
+void	handler_heredoc(int signum);
+void	heredoc_sigint(int sig);
+void	cmd_handler(int signum);
 
 // === UTILS ===
 void	print_tokens(t_lexer *lx);

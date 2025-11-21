@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   is_builtin.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/31 18:58:11 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/13 17:29:10 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/20 17:46:15 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ int	is_parent_builtin(char *cmd)
 		|| !ft_strcmp(cmd, "exit"));
 }
 
-int	exec_builtin(t_cmd *cmd, char ***env)
+int	exec_builtin(t_shell *sh, t_cmd *cmd, char ***env)
 {
 	if (!cmd || !cmd->argv || !cmd->argv[0])
 		return (1);
@@ -46,11 +46,11 @@ int	exec_builtin(t_cmd *cmd, char ***env)
 	else if (!ft_strcmp(cmd->argv[0], "cd"))
 	{
 		if (cmd->argv[1])
-			return (cd(cmd->argv[1], env));
-		return (cd(NULL, env));
+			return (cd(sh, cmd->argv[1], env));
+		return (cd(sh, NULL, env));
 	}
 	else if (!ft_strcmp(cmd->argv[0], "exit"))
-		return (my_exit(cmd->argv));
+		return (my_exit());
 	else if (!ft_strcmp(cmd->argv[0], "env"))
 		return (my_env(*env));
 	else if (!ft_strcmp(cmd->argv[0], "export"))

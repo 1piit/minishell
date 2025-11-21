@@ -3,24 +3,24 @@
 /*                                                        :::      ::::::::   */
 /*   exec.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 20:41:13 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 13:52:42 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/20 22:21:03 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	wait_child(pid_t pid)
+void	wait_child(t_shell *sh, pid_t pid)
 {
 	int	status;
 
 	waitpid(pid, &status, 0);
 	if (WIFEXITED(status))
-		g_exit_status = WEXITSTATUS(status);
+		sh->exit_status = WEXITSTATUS(status);
 	else
-		g_exit_status = 1;
+		sh->exit_status = 1;
 }
 
 void	exec_init(t_exec *exec, t_cmd *cmd)
@@ -33,7 +33,7 @@ void	exec_init(t_exec *exec, t_cmd *cmd)
 		exit(1);
 	exec->pids = malloc(exec->nb_cmds * sizeof(*exec->pids));
 	if (!exec->pids)
-		exit(1);
+		return (free(exec->pipes), exit(1));
 }
 
 void	execve_cmd(t_cmd *cmd, char ***env)
@@ -59,15 +59,19 @@ void	execve_cmd(t_cmd *cmd, char ***env)
 	exit(126);
 }
 
-void	process_single_cmd(t_cmd *cmd, char ***env)
+void	process_single_cmd(t_shell *sh, t_cmd *cmd, char ***env)
 {
 	pid_t	pid;
+
+	if (cmd->redir)
+		if (handle_heredocs(cmd->redir) == -1)
+			return ;
 
 	if (is_parent_builtin(cmd->argv[0]))
 	{
 		if (setup_redirections(cmd) == -1)
 			exit(1);
-		g_exit_status = exec_builtin(cmd, env);
+		sh->exit_status = exec_builtin(sh, cmd, env);
 	}
 	else
 	{
@@ -77,11 +81,11 @@ void	process_single_cmd(t_cmd *cmd, char ***env)
 			if (setup_redirections(cmd) == -1)
 				exit(1);
 			if (is_builtin(cmd->argv[0]))
-				exit(g_exit_status = exec_builtin(cmd, env));
+				sh->exit_status = exec_builtin(sh, cmd, env);
 			else
 				execve_cmd(cmd, env);
 		}
 		else
-			wait_child(pid);
+			wait_child(sh, pid);
 	}
 }

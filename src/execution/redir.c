@@ -6,7 +6,7 @@
 /*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 17:13:42 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/12 15:03:29 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/21 12:49:42 by pbride           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,13 @@ int	apply_append(t_redir *r)
 	return (0);
 }
 
+int	is_heredoc(t_redir *r)
+{
+	if (dup2(r->tmp_fd, STDIN_FILENO) == -1)
+		return (perror("dup2 heredoc"), -1);
+	return (0);
+}
+
 int	setup_redirections(t_cmd *cmd)
 {
 	t_redir	*r;
@@ -60,14 +67,15 @@ int	setup_redirections(t_cmd *cmd)
 	r = cmd->redir;
 	while (r)
 	{
-		if (r->type == T_REDIR_IN)
+		perm_file = 0;
+		if (r->type == T_HEREDOC)
+			perm_file = is_heredoc(r);
+		else if (r->type == T_REDIR_IN)
 			perm_file = redir_apply_in(r);
 		else if (r->type == T_REDIR_OUT)
 			perm_file = redir_apply_out(r);
 		else if (r->type == T_APPEND)
 			perm_file = apply_append(r);
-		else if (r->type == T_HEREDOC)
-			perm_file = handle_heredoc(r);
 		if (perm_file == -1)
 			return (-1);
 		r = r->next;
