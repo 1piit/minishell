@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 22:17:24 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/21 18:59:21 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@
 # include <fcntl.h>
 # include <limits.h>
 # include <stdbool.h>
+# include <termios.h>
 
 // === VERSION ===
 # define VERSION		"V0.8"
@@ -49,7 +50,7 @@
 
 # define ERR			-1
 
-extern int	g_signal;
+extern volatile sig_atomic_t	g_signal;
 
 typedef struct s_redir
 {
@@ -120,16 +121,17 @@ typedef struct s_heredoc
 
 typedef struct s_shell
 {
-	char		**env;
-	t_lexer		*lx;
-	t_cmd		*cmds_head;
-	t_exec		*exec;
-	t_heredoc	*rdoc;
-	int			last_status;
-	int			running_status;
-	int			stdin_backup;
-	int			stdout_backup;
-	int			exit_status;
+	char			**env;
+	t_lexer			*lx;
+	t_cmd			*cmds_head;
+	t_exec			*exec;
+	t_heredoc		*rdoc;
+	int				last_status;
+	int				running_status;
+	int				stdin_backup;
+	int				stdout_backup;
+	int				exit_status;
+	struct termios	g_saved_term;
 }	t_shell;
 
 // === BUILT-IN ===
@@ -140,6 +142,7 @@ int		echo(char **av);
 int		my_export(char **args, char ***env);
 char	*get_env_value(t_shell *sh, char **envp, char *name);
 void	add_or_update_env(char ***env, const char *var_value);
+void	update_env_var(char ***env, const char *var, const char *value);
 int		unset(char ***env, char **args);
 int		is_parent_builtin(char *cmd);
 int		is_builtin(char *cmd);

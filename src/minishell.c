@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 12:27:27 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 23:00:07 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/21 18:57:57 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,9 +50,14 @@ void	minishell_loop(t_shell *sh)
 		}
 		if (g_signal == SIGINT)
 		{
-			free(line);
+			tcsetattr(STDIN_FILENO, TCSANOW, &sh->g_saved_term);
+			if (line[0] == '\0')
+			{
+				free(line);
+				g_signal = 0;
+				continue ;
+			}
 			g_signal = 0;
-			continue ;
 		}
 		if (*line)
 			add_history(line);

@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 19:20:39 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 17:42:13 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/21 18:35:14 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,25 +36,33 @@ t_cmd	*parse_command(t_token **current)
 	}
 	cmd->argv[argc] = NULL;
 	return (cmd);
+
 }
 
 t_cmd	*parse_all(t_shell *sh, t_token **line_ptr)
 {
-	t_token	*line;
-	t_cmd	*head;
-	t_cmd	*last;
-	int		special_count;
+    t_token	*line;
+    t_cmd	*head;
+    t_cmd	*last;
+    int		special_count;
 
-	(void)sh;
-	line = *line_ptr;
-	head = NULL;
-	last = NULL;
-	sh->cmds_head = head;
+    (void)sh;
+    line = *line_ptr;
+    head = NULL;
+    last = NULL;
+    sh->cmds_head = head;
 	while (line)
 	{
 		special_count = 0;
 		if (line->is_operator)
 		{
+			if (line->type == T_REDIR_IN || line->type == T_REDIR_OUT
+				|| line->type == T_APPEND || line->type == T_HEREDOC)
+			{
+				if (process_and_append(&line, &head, &last) != 0)
+					return (perror("parse_command"), NULL);
+				continue ;
+			}
 			special_count = handle_specials(&line);
 			if (special_count < 0)
 				return (NULL);

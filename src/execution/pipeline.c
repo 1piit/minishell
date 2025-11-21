@@ -6,11 +6,12 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/07 00:07:11 by pbride            #+#    #+#             */
-/*   Updated: 2025/11/20 23:00:28 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/21 18:22:26 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include <termios.h>
 
 static void	run_cmd(t_shell *sh, t_cmd *cmd, char ***env)
 {
@@ -24,6 +25,15 @@ static void	run_cmd(t_shell *sh, t_cmd *cmd, char ***env)
 void	process_childs(t_shell *sh, t_exec *exec, t_cmd *cmd, char ***env)
 {
 	int		cmds_index;
+
+	/* child should have default signal dispositions */
+	struct sigaction sa;
+
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	sa.sa_handler = SIG_DFL;
+	sigaction(SIGINT, &sa, NULL);
+	sigaction(SIGQUIT, &sa, NULL);
 
 	cmds_index = cmd->cmd_index;
 	if (cmds_index > 0)
@@ -54,6 +64,8 @@ void	process_pipeline(t_shell *sh, t_exec *exec, t_cmd *cmd, char ***env)
 {
 	int		cmds_index;
 	t_cmd	*tmp;
+    struct termios saved_term;
+    int saved_ok;
 
 	tmp = cmd;
 	while (tmp)
@@ -65,6 +77,7 @@ void	process_pipeline(t_shell *sh, t_exec *exec, t_cmd *cmd, char ***env)
 	}
 	create_pipes(exec);
 	cmds_index = 0;
+	saved_ok = (tcgetattr(STDIN_FILENO, &saved_term) == 0);
 	while (cmd && cmds_index < exec->nb_cmds)
 	{
 		cmd->cmd_index = cmds_index;
@@ -80,4 +93,6 @@ void	process_pipeline(t_shell *sh, t_exec *exec, t_cmd *cmd, char ***env)
 	}
 	close_all_pipes_fds(exec);
 	wait_all_childs(sh, exec);
+	if (saved_ok)
+		tcsetattr(STDIN_FILENO, TCSANOW, &saved_term);
 }
