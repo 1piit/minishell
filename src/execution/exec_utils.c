@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/07 00:08:24 by pbride            #+#    #+#             */
-/*   Updated: 2025/11/13 15:03:19 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/22 06:01:27 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@ int	count_cmds(t_cmd *cmds)
 
 int	has_slash(char *str)
 {
+	if (!str)
+		return (0);
 	while (*str)
 	{
 		if (*str == '/')
@@ -91,6 +93,7 @@ char	*resolve_cmd(char *cmd)
 		full_cmd_path = join_path(*dirs, cmd);
 		if (is_executable_file(full_cmd_path))
 			return (free_tab(dirs_start), full_cmd_path);
+		free(full_cmd_path);
 		dirs++;
 	}
 	return (free_tab(dirs_start), NULL);

@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/20 20:38:20 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 22:50:49 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/21 18:22:26 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,6 @@ int	has_heredoc(t_redir *r)
 void	heredoc_sigint(int sig)
 {
 	(void)sig;
+	g_signal = SIGINT;
 	write(1, "\n", 1);
-	rl_replace_line("", 0);
-	rl_done = 1;
 }

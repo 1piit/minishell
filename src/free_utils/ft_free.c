@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_free.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 13:33:06 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 13:03:52 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/22 11:32:49 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,12 @@ void	free_redirs(t_redir *redir)
 		tmp = redir->next;
 		if (redir->file)
 			free(redir->file);
+		if (redir->tmp_file)
+			free(redir->tmp_file);
+		if (redir->tmp_fd > 0)
+			close(redir->tmp_fd);
+		if (redir->h_fd > 0)
+			close(redir->h_fd);
 		free(redir);
 		redir = tmp;
 	}

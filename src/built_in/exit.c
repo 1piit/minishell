@@ -6,13 +6,16 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/31 20:01:42 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/18 19:42:20 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/22 07:36:05 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <minishell.h>
 
-int	my_exit(void)
+int	my_exit(t_shell *sh)
 {
-	exit(1);
+	free_exit_sh(sh);
+	rl_clear_history();
+	printf("exit\n");
+	exit(0);
 }
