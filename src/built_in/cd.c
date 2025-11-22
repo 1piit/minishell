@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:53:28 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/21 20:19:40 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/22 08:55:05 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,8 +55,7 @@ void	update_env_var(char ***env, const char *var, const char *value)
 			&& (*env)[idx][ft_strlen(var)] == '=')
 		{
 			free((*env)[idx]);
-			(*env)[idx] = ft_strdup(tmp);
-			free(tmp);
+			(*env)[idx] = tmp;
 			return ;
 		}
 		idx++;

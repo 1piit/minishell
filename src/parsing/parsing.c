@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 19:20:39 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/22 06:51:56 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/22 08:46:40 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ t_cmd	*parse_command(t_token **current)
 	cmd->fd_out = STDOUT_FILENO;
 	cmd->next = NULL;
 	if (fill_argv(cmd, current))
-		return (NULL);
+		return (free(cmd), NULL);
 	return (cmd);
 }
 

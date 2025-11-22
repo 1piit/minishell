@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 06:30:00 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/22 06:51:34 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/22 09:00:07 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,10 +24,20 @@ t_cmd	*parse_line(t_shell *sh, char *line)
 	}
 	tokenize(sh, line, sh->env);
 	cmds = parser(sh);
-	free_tokens_2(sh->lx->head);
-	sh->lx->head = NULL;
-	if (sh->lx)
-		sh->lx->cmds = cmds;
+	if (sh->lx && sh->lx->head)
+	{
+		free_tokens_2(sh->lx->head);
+		sh->lx->head = NULL;
+	}
+	if (!cmds)
+	{
+		if (sh->lx && sh->lx->word)
+			free(sh->lx->word);
+		free(sh->lx);
+		sh->lx = NULL;
+		return (NULL);
+	}
+	sh->lx->cmds = cmds;
 	return (cmds);
 }
 
@@ -46,6 +56,8 @@ void	free_parsed_cmds(t_shell *sh)
 		cmds = next;
 	}
 	sh->lx->cmds = NULL;
+	if (sh->lx->word)
+		free(sh->lx->word);
 	free(sh->lx);
 	sh->lx = NULL;
 }

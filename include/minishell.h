@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/22 06:58:58 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/22 08:28:37 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,9 +52,21 @@
 
 extern volatile sig_atomic_t	g_signal;
 
+typedef enum e_tokentype
+{
+	T_INVALID = 0,
+	T_WORD,
+	T_PIPE,
+	T_REDIR_IN,
+	T_REDIR_OUT,
+	T_APPEND,
+	T_HEREDOC,
+	T_END
+}	t_tokentype;
+
 typedef struct s_redir
 {
-	int				type;
+	t_tokentype		type;
 	char			*file;
 	int				h_fd;
 	int				tmp_fd;
@@ -73,18 +85,6 @@ typedef struct s_cmd
 	struct s_cmd	*next;
 }	t_cmd;
 
-typedef enum e_tokentype
-{
-	T_INVALID = 0,
-	T_WORD,
-	T_PIPE,
-	T_REDIR_IN,
-	T_REDIR_OUT,
-	T_APPEND,
-	T_HEREDOC,
-	T_END
-}	t_tokentype;
-
 typedef struct s_token
 {
 	t_tokentype		type;
@@ -97,7 +97,7 @@ typedef struct s_lexer
 {
 	t_token	*head;
 	t_token	*last;
-	char	word[4096];
+	char	*word;
 	int		j;
 	char	quote;
 	t_cmd	*cmds;
@@ -159,7 +159,7 @@ int		unset(char ***env, char **args);
 int		is_parent_builtin(char *cmd);
 int		is_builtin(char *cmd);
 int		exec_builtin(t_shell *sh, t_cmd *cmd, char ***env);
-int		my_exit(void);
+int		my_exit(t_shell *sh);
 
 // === MINISHELL ===
 int		main(int ac, char **av, char **envp);
@@ -252,6 +252,8 @@ void	free_exec_sh(t_exec *exec);
 void	free_rdocs_sh(t_heredoc *rdoc);
 void	free_exit_sh(t_shell *sh);
 void	free_tokens_2(t_token *head);
+void	free_exit_sh_part1(t_shell *sh);
+void	free_exit_sh_part2(t_shell *sh);
 
 // === SIGNALS ===
 void	sigint_handler(int signum);

@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 06:40:00 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/22 06:45:12 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/22 08:46:40 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,6 @@ int	fill_argv(t_cmd *cmd, t_token **current)
 				i++;
 			}
 			free(cmd->argv);
-			free(cmd);
 			return (1);
 		}
 		argc++;

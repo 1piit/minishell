@@ -6,13 +6,13 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 06:20:00 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/22 06:22:02 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/22 08:28:38 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	create_default_env(t_shell *sh)
+static int	alloc_default_env(t_shell *sh)
 {
 	char	*home;
 
@@ -24,12 +24,36 @@ int	create_default_env(t_shell *sh)
 	{
 		sh->env[0] = ft_strjoin("HOME=", home);
 		if (!sh->env[0])
+		{
 			sh->env[0] = ft_strdup("HOME=/");
+			if (!sh->env[0])
+				return (free(sh->env), ERR);
+		}
 	}
 	else
+	{
 		sh->env[0] = ft_strdup("HOME=/");
-	sh->env[1] = ft_strdup("SHLVL=1");
+		if (!sh->env[0])
+			return (free(sh->env), ERR);
+	}
 	sh->env[2] = NULL;
+	return (0);
+}
+
+static int	set_shlvl_default(t_shell *sh)
+{
+	sh->env[1] = ft_strdup("SHLVL=1");
+	if (!sh->env[1])
+		return (ERR);
+	return (0);
+}
+
+int	create_default_env(t_shell *sh)
+{
+	if (alloc_default_env(sh) == ERR)
+		return (ERR);
+	if (set_shlvl_default(sh) == ERR)
+		return (free_tab(sh->env), ERR);
 	return (0);
 }
 
@@ -49,6 +73,12 @@ int	copy_envp(t_shell *sh, char **envp)
 	while (envp[i])
 	{
 		sh->env[i] = ft_strdup(envp[i]);
+		if (!sh->env[i])
+		{
+			while (i > 0)
+				free(sh->env[--i]);
+			return (free(sh->env), ERR);
+		}
 		i++;
 	}
 	sh->env[i] = NULL;

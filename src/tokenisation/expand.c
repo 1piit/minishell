@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:54:05 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/22 06:52:34 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/22 07:48:52 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,5 +86,7 @@ int	copy_var_value(t_shell *sh, char *dst, const char *src, int *i)
 	val = get_env_value(sh, sh->env, name);
 	if (!val)
 		return (0);
-	return (ft_strlcpy(dst, val, 4096));
+	len = ft_strlcpy(dst, val, 4096);
+	free(val);
+	return (len);
 }
