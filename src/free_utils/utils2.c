@@ -12,6 +12,12 @@
 
 #include "minishell.h"
 
+void	exec_destroy(t_exec *exec)
+{
+	free(exec->pipes);
+	free(exec->pids);
+}
+
 void	free_redir(t_redir *redir)
 {
 	t_redir	*tmp;

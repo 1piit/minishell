@@ -6,81 +6,103 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 17:15:13 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/21 21:01:38 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/22 07:22:40 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include <signal.h>
-#include <termios.h>
 
-static void	run_heredoc_child(t_redir *r, int write_fd)
+static int	finish_heredoc(t_hdoc_ctx *c, t_redir *r)
+{
+	waitpid(c->pid, &c->status, 0);
+	signal(SIGINT, c->old_handler);
+	if (c->saved_ok)
+		tcsetattr(STDIN_FILENO, TCSANOW, &c->saved_term);
+	if (WIFSIGNALED(c->status) && WTERMSIG(c->status) == SIGINT)
+	{
+		ft_putstr_fd("\n", STDOUT_FILENO);
+		return (close(c->fd[0]), -1);
+	}
+	if (WIFEXITED(c->status) && WEXITSTATUS(c->status) == 130)
+	{
+		ft_putstr_fd("\n", STDOUT_FILENO);
+		return (close(c->fd[0]), -1);
+	}
+	if (WIFEXITED(c->status) && WEXITSTATUS(c->status) == 2)
+	{
+		ft_putstr_fd("bash: warning: here-document at"
+			"line 1 delimited by end-of-file (wanted `", STDERR_FILENO);
+		ft_putstr_fd(r->file, STDERR_FILENO);
+		ft_putstr_fd("')\n", STDERR_FILENO);
+	}
+	if (r->tmp_fd > 0)
+		close(r->tmp_fd);
+	r->tmp_fd = c->fd[0];
+	return (0);
+}
+
+static int	heredoc_loop(t_shell *sh, t_redir *r, int write_fd)
 {
 	char	*line;
+	char	*expanded;
+
+	while (1)
+	{
+		line = readline("> ");
+		if (!line)
+		{
+			free(line);
+			return (2);
+		}
+		if (ft_strcmp(line, r->file) == 0)
+		{
+			free(line);
+			return (0);
+		}
+		expanded = expand_vars(sh, line, 1);
+		if (expanded)
+		{
+			write(write_fd, expanded, ft_strlen(expanded));
+			write(write_fd, "\n", 1);
+			free(expanded);
+		}
+		free(line);
+	}
+}
+
+static void	run_heredoc_child(t_shell *sh, t_redir *r, int write_fd)
+{
+	int	res;
 
 	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_IGN);
 	rl_catch_signals = 1;
-	rl_clear_history();
-	while (1)
-	{
-		line = readline("> ");
-		if (!line || ft_strcmp(line, r->file) == 0)
-		{
-			free(line);
-			break ;
-		}
-		write(write_fd, line, ft_strlen(line));
-		write(write_fd, "\n", 1);
-		free(line);
-	}
+	res = heredoc_loop(sh, r, write_fd);
 	close(write_fd);
-	exit(0);
+	exit(res);
 }
 
-int	handle_heredoc(t_redir *r)
+int	handle_heredoc(t_shell *sh, t_redir *r)
 {
-	pid_t	pid;
-	int		fd[2];
-	int		status;
+	t_hdoc_ctx	c;
 
-	if (pipe(fd) == -1)
+	if (pipe(c.fd) == -1)
 		return (perror("pipe"), -1);
-	struct termios saved_term;
-	int saved_ok;
-
-	struct sigaction	old_sa;
-	struct sigaction	sa;
-
-	saved_ok = (tcgetattr(STDIN_FILENO, &saved_term) == 0);
-	sigemptyset(&sa.sa_mask);
-	sa.sa_flags = 0;
-	sa.sa_handler = SIG_IGN;
-	sigaction(SIGINT, &sa, &old_sa);
-	pid = fork();
-	if (pid < 0)
+	c.saved_ok = (tcgetattr(STDIN_FILENO, &c.saved_term) == 0);
+	c.old_handler = signal(SIGINT, SIG_IGN);
+	c.pid = fork();
+	if (c.pid < 0)
 		return (perror("fork"), -1);
-	if (pid == 0)
+	if (c.pid == 0)
 	{
-		close(fd[0]);
-		run_heredoc_child(r, fd[1]);
+		close(c.fd[0]);
+		run_heredoc_child(sh, r, c.fd[1]);
 	}
-	close(fd[1]);
-	waitpid(pid, &status, 0);
-	sigaction(SIGINT, &old_sa, NULL);
-	if (saved_ok)
-		tcsetattr(STDIN_FILENO, TCSANOW, &saved_term);
-	if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
-		return (close(fd[0]), -1);
-	if (WIFEXITED(status) && WEXITSTATUS(status) == 130)
-		return (close(fd[0]), -1);
-	if (r->tmp_fd > 0)
-		close(r->tmp_fd);
-	r->tmp_fd = fd[0];
-	return (0);
+	close(c.fd[1]);
+	return (finish_heredoc(&c, r));
 }
 
-int	handle_heredocs(t_redir *redir)
+int	handle_heredocs(t_shell *sh, t_redir *redir)
 {
 	t_redir	*r;
 
@@ -88,7 +110,7 @@ int	handle_heredocs(t_redir *redir)
 	while (r)
 	{
 		if (r->type == T_HEREDOC)
-			if (handle_heredoc(r) == -1)
+			if (handle_heredoc(sh, r) == -1)
 				return (-1);
 		r = r->next;
 	}

@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 21:19:31 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/21 21:34:15 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/22 05:32:18 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,13 +48,9 @@ void	free_cmds_sh(t_cmd *cmd)
 			free(cmd->redir);
 			cmd->redir = tmp_redir;
 		}
-		if (tmp_redir)
-			free(tmp_redir);
 		free(cmd);
 		cmd = tmp_cmd;
 	}
-	if (tmp_cmd)
-		free(tmp_cmd);
 }
 
 void	free_exec_sh(t_exec *exec)
@@ -80,8 +76,6 @@ void	free_rdocs_sh(t_heredoc *rdoc)
 		free(rdoc);
 		rdoc = tmp_rdoc;
 	}
-	if (tmp_rdoc)
-		free(tmp_rdoc);
 }
 
 void	free_exit_sh(t_shell *sh)

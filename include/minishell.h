@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/21 22:25:09 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/22 06:58:58 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,6 +119,17 @@ typedef struct s_heredoc
 	struct s_heredoc	*next;
 }	t_heredoc;
 
+// LOCAL HEREDOC STRUCT pour signaux
+typedef struct s_hdoc_ctx
+{
+	pid_t			pid;
+	int				fd[2];
+	int				status;
+	struct termios	saved_term;
+	int				saved_ok;
+	void			(*old_handler)(int);
+}	t_hdoc_ctx;
+
 typedef struct s_shell
 {
 	char			**env;
@@ -156,6 +167,11 @@ void	minishell_loop(t_shell *sh);
 int		init_env(t_shell *sh, char **envp);
 char	*token_type_to_str(t_tokentype type);
 void	exec_destroy(t_exec *exec);
+int		create_default_env(t_shell *sh);
+int		copy_envp(t_shell *sh, char **envp);
+int		increment_shlvl_in_env(t_shell *sh);
+t_cmd	*parse_line(t_shell *sh, char *line);
+void	free_parsed_cmds(t_shell *sh);
 
 // === TOKENISATION ===
 void	skip_spaces(const char *line, int *i);
@@ -184,7 +200,11 @@ t_cmd	*parse_all(t_shell *sh, t_token **line_ptr);
 int		parse_redirections(t_token **current, t_cmd *cmd,
 			int special_count, t_token *line);
 int		setup_redirections(t_cmd *cmd);
+int		process_line_sequence(t_token **line, t_cmd **head, t_cmd **last);
 t_cmd	*parse_command(t_token **current);
+int		count_words(t_token *tmp);
+int		fill_argv(t_cmd *cmd, t_token **current);
+int		handle_operator_node(t_token **line, t_cmd **head, t_cmd **last);
 
 // === EXECUTION ===
 // PIPE
@@ -193,7 +213,7 @@ void	create_pipes(t_exec *exec);
 void	process_childs(t_shell *sh, t_exec *exec, t_cmd *cmds,
 			char ***env);
 void	process_parent(int cmds_index, t_exec *exec);
-void	process_pipeline(t_shell *sh, t_exec *exec, t_cmd *cmds,
+int		process_pipeline(t_shell *sh, t_exec *exec, t_cmd *cmds,
 			char ***env);
 // EXEC
 void	command_not_found(char *cmd);
@@ -211,9 +231,8 @@ void	execve_cmd(t_cmd *cmd, char ***env);
 int		redir_apply_in(t_redir *r);
 int		redir_apply_out(t_redir *r);
 int		apply_append(t_redir *r);
-int		handle_heredocs(t_redir *r);
-/* helper: run_heredoc_child is internal to heredoc.c */
-// int		run_heredoc_child(t_redir *r, int pipe_end);
+int		handle_heredoc(t_shell *sh, t_redir *r);
+int		handle_heredocs(t_shell *sh, t_redir *r);
 int		has_heredoc(t_redir *r);
 
 // === TEST_UTILS ===
@@ -232,7 +251,6 @@ void	free_cmds_sh(t_cmd *cmd);
 void	free_exec_sh(t_exec *exec);
 void	free_rdocs_sh(t_heredoc *rdoc);
 void	free_exit_sh(t_shell *sh);
-void	free_command(t_cmd *cmd);
 void	free_tokens_2(t_token *head);
 
 // === SIGNALS ===

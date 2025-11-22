@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:54:05 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 17:56:12 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/22 06:52:34 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,23 +37,6 @@ char	*expand_vars(t_shell *sh, const char *str, int expand)
 	buf[j] = '\0';
 	return (ft_strdup(buf));
 }
-
-/*
-char	*get_env_value(char **env, const char *var)
-{
-	int		i;
-	size_t	len;
-
-	len = ft_strlen(var);
-	i = 0;
-	while (env[i])
-	{
-		if (ft_strncmp(env[i], var, len) == 0 && env[i][len] == '=')
-			return (env[i] + len + 1);
-		i++;
-	}
-	return ("");
-}*/
 
 char	*get_env_value(t_shell *sh, char **envp, char *name)
 {

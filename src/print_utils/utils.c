@@ -6,18 +6,11 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/04 14:10:24 by pbride            #+#    #+#             */
-/*   Updated: 2025/11/21 20:49:01 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/22 06:01:01 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-void	exec_destroy(t_exec *exec)
-{
-	free(exec->pipes);
-	free(exec->pids);
-}
-
 
 void	print_tokens(t_lexer *lx)
 {

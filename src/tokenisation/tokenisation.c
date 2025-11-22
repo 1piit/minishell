@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:54:10 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/21 20:19:19 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/22 06:01:59 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,7 @@ char	*extract_quoted_part(t_shell *sh, const char *line, int *i, char **env)
 	if (quote == '"')
 	{
 		expanded = expand_vars(sh, part, 1);
-		free(part);
-		return (expanded);
+		return (free(part), expanded);
 	}
 	return (part);
 }
