@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 08:05:53 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/22 08:07:03 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/22 12:24:14 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,14 @@ void	free_exit_sh_part1(t_shell *sh)
 
 void	free_exit_sh_part2(t_shell *sh)
 {
+	t_cmd	*c;
+
+	c = NULL;
+	if (sh->cmds_head)
+		c = sh->cmds_head;
+	else if (sh->lx && sh->lx->cmds)
+		c = sh->lx->cmds;
+	close_all_cmds_tmpfds(c);
 	if (sh->cmds_head)
 		free_cmds_sh(sh->cmds_head);
 	if (sh->exec)
@@ -42,4 +50,24 @@ void	free_exit_sh_part2(t_shell *sh)
 	sh->cmds_head = NULL;
 	sh->exec = NULL;
 	sh->rdoc = NULL;
+}
+
+void	close_all_cmds_tmpfds(t_cmd *c)
+{
+	t_redir	*r;
+
+	while (c)
+	{
+		r = c->redir;
+		while (r)
+		{
+			if (r->tmp_fd > 0)
+			{
+				close(r->tmp_fd);
+				r->tmp_fd = -1;
+			}
+			r = r->next;
+		}
+		c = c->next;
+	}
 }

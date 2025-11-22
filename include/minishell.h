@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/22 08:28:37 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/22 13:23:48 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -210,11 +210,15 @@ int		handle_operator_node(t_token **line, t_cmd **head, t_cmd **last);
 // PIPE
 void	close_all_pipes_fds(t_exec *exec);
 void	create_pipes(t_exec *exec);
-void	process_childs(t_shell *sh, t_exec *exec, t_cmd *cmds,
-			char ***env);
-void	process_parent(int cmds_index, t_exec *exec);
-int		process_pipeline(t_shell *sh, t_exec *exec, t_cmd *cmds,
-			char ***env);
+void	process_childs(t_shell *sh, t_exec *exec, t_cmd *cmd,
+			int (*pipes)[2]);
+void	child_setup_signals_and_io(t_shell *sh, t_exec *exec, t_cmd *cmd,
+			int (*pipes)[2]);
+void	child_close_local_pipes(int (*pipes)[2], int nb);
+void	close_other_cmds_heredoc_fds(t_shell *sh, t_cmd *cmd);
+void	process_parent(int cmds_index, t_exec *exec, int (*pipes)[2]);
+int		process_pipeline(t_shell *sh, t_exec *exec, t_cmd *cmds);
+int		spawn_and_wait(t_shell *sh, t_exec *exec, t_cmd *cmd);
 // EXEC
 void	command_not_found(char *cmd);
 void	process_single_cmd(t_shell *sh, t_cmd *cmd, char ***env);
@@ -226,7 +230,7 @@ int		count_cmds(t_cmd *cmds);
 void	exec_init(t_exec *exec, t_cmd *cmd);
 void	wait_child(t_shell *sh, pid_t pid);
 void	wait_all_childs(t_shell *sh, t_exec *exec);
-void	execve_cmd(t_cmd *cmd, char ***env);
+void	execve_cmd(t_shell *sh, t_cmd *cmd, char ***env);
 // REDIR
 int		redir_apply_in(t_redir *r);
 int		redir_apply_out(t_redir *r);
@@ -251,6 +255,11 @@ void	free_cmds_sh(t_cmd *cmd);
 void	free_exec_sh(t_exec *exec);
 void	free_rdocs_sh(t_heredoc *rdoc);
 void	free_exit_sh(t_shell *sh);
+void	free_inherited_state(t_shell *sh);
+void	free_and_exit(t_shell *sh, int code);
+int		pre_process_single_cmd(t_shell *sh, t_cmd *cmd, char ***env);
+void	close_heredoc_tmpfds(t_redir *r);
+void	close_all_cmds_tmpfds(t_cmd *c);
 void	free_tokens_2(t_token *head);
 void	free_exit_sh_part1(t_shell *sh);
 void	free_exit_sh_part2(t_shell *sh);

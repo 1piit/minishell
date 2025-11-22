@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 21:19:31 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/22 09:10:53 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/22 12:24:14 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,10 @@ void	free_cmds_sh(t_cmd *cmd)
 				free(cmd->redir->file);
 			if (cmd->redir->tmp_file)
 				free(cmd->redir->tmp_file);
+			if (cmd->redir->tmp_fd > 0)
+				close(cmd->redir->tmp_fd);
+			if (cmd->redir->h_fd > 0)
+				close(cmd->redir->h_fd);
 			free(cmd->redir);
 			cmd->redir = tmp_redir;
 		}

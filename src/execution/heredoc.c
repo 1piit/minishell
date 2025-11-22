@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 17:15:13 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/22 07:22:40 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/22 11:43:48 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,7 +79,8 @@ static void	run_heredoc_child(t_shell *sh, t_redir *r, int write_fd)
 	rl_catch_signals = 1;
 	res = heredoc_loop(sh, r, write_fd);
 	close(write_fd);
-	exit(res);
+	free_inherited_state(sh);
+	_exit(res);
 }
 
 int	handle_heredoc(t_shell *sh, t_redir *r)

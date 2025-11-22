@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 22:05:21 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/21 22:12:58 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/22 11:43:48 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,4 +50,28 @@ void	free_tokens_2(t_token *head)
 		free(head);
 		head = tmp;
 	}
+}
+
+void	free_inherited_state(t_shell *sh)
+{
+	if (!sh)
+		return ;
+	if (sh->env)
+		free_tab(sh->env);
+	if (sh->g_env)
+		free_tab(sh->g_env);
+	if (sh->lx)
+		free_lx_sh(sh->lx);
+	if (sh->cmds_head)
+		free_cmds_sh(sh->cmds_head);
+	if (sh->exec)
+		free_exec_sh(sh->exec);
+	if (sh->rdoc)
+		free_rdocs_sh(sh->rdoc);
+}
+
+void	free_and_exit(t_shell *sh, int code)
+{
+	free_inherited_state(sh);
+	_exit(code);
 }
