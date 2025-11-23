@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 12:27:27 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/23 17:52:38 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 19:26:33 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,14 +38,13 @@ static int	handle_input(t_shell *sh, char *line)
 		return (0);
 	if (g_signal == SIGINT)
 	{
-		tcsetattr(STDIN_FILENO, TCSANOW, &sh->g_saved_term);
+		g_signal = 0;
 		if (line[0] == '\0')
 		{
 			free(line);
 			g_signal = 0;
 			return (1);
 		}
-		g_signal = 0;
 	}
 	if (*line)
 		add_history(line);
@@ -67,6 +66,7 @@ void	minishell_loop(t_shell *sh)
 	setup_signals();
 	while (1)
 	{
+		tcsetattr(STDIN_FILENO, TCSANOW, &sh->g_saved_term);
 		line = readline("minishell (" VERSION ") $ ");
 		if (!handle_input(sh, line))
 			return ;

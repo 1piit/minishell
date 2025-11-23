@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 17:15:13 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/23 18:29:15 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 19:44:55 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,14 +23,12 @@ static int	finish_heredoc(t_hdoc_ctx *c, t_redir *r)
 		ft_putstr_fd("\n", STDOUT_FILENO);
 		if (r->tmp_fd > 0)
 			close(r->tmp_fd);
-		close(c->fd[0]);
-		return (-1);
+		return (close(c->fd[0]), -1);
 	}
 	if (WIFEXITED(c->status) && WEXITSTATUS(c->status) == 130)
 	{
 		ft_putstr_fd("\n", STDOUT_FILENO);
-		close(c->fd[0]);
-		return (-1);
+		return (close(c->fd[0]), -1);
 	}
 	if (WIFEXITED(c->status) && WEXITSTATUS(c->status) == 2)
 	{
@@ -95,21 +93,11 @@ int	handle_heredoc(t_shell *sh, t_redir *r)
 	t_hdoc_ctx	**ctx_ptr;
 	int			status_sig_rdoc;
 
-	if (pipe(c.fd) == -1)
-		return (perror("pipe"), -1);
-	c.cleanup_sh = sh;
-	ctx_ptr = get_heredoc_ctx();
-	*ctx_ptr = &c;
-	c.saved_ok = (tcgetattr(STDIN_FILENO, &c.saved_term) == 0);
-	c.old_handler = signal(SIGINT, SIG_IGN);
+	if (init_heredoc_ctx(&c, sh) == -1)
+		return (-1);
 	c.pid = fork();
 	if (c.pid < 0)
-	{
-		*ctx_ptr = NULL;
-		close(c.fd[0]);
-		close(c.fd[1]);
-		return (perror("fork"), -1);
-	}
+		return (handle_fork_error(&c));
 	if (c.pid == 0)
 	{
 		close(c.fd[0]);
@@ -117,6 +105,7 @@ int	handle_heredoc(t_shell *sh, t_redir *r)
 	}
 	close(c.fd[1]);
 	status_sig_rdoc = finish_heredoc(&c, r);
+	ctx_ptr = get_heredoc_ctx();
 	*ctx_ptr = NULL;
 	if (status_sig_rdoc == -1)
 		return (-1);

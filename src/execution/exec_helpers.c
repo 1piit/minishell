@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 12:00:00 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/23 17:37:41 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 19:49:26 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,4 +59,31 @@ void	exec_init(t_exec *exec, t_cmd *cmd)
 	exec->fd_out = 0;
 	exec->pipes = NULL;
 	exec->pids = NULL;
+}
+
+void	exec_slash_cmd(t_shell *sh, t_cmd *cmd, char ***env)
+{
+	if (has_slash(cmd->argv[0]) && is_executable_file(cmd->argv[0]))
+	{
+		execve(cmd->argv[0], cmd->argv, *env);
+		perror(cmd->argv[0]);
+		free_and_exit(sh, 126);
+	}
+}
+
+void	exec_resolved_cmd(t_shell *sh, t_cmd *cmd, char ***env)
+{
+	char	*full_cmd_path;
+
+	full_cmd_path = resolve_cmd(sh, *env, cmd->argv[0]);
+	if (!full_cmd_path)
+	{
+		command_not_found(cmd->argv[0]);
+		free(full_cmd_path);
+		free_and_exit(sh, 127);
+	}
+	execve(full_cmd_path, cmd->argv, *env);
+	free(full_cmd_path);
+	perror(cmd->argv[0]);
+	free_and_exit(sh, 126);
 }

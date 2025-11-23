@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 20:41:13 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/23 14:48:20 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 19:49:26 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,29 +21,26 @@ static void	run_cmd_in_child(t_shell *sh, t_cmd *cmd, char ***env)
 	saved_ok = (tcgetattr(STDIN_FILENO, &saved_term) == 0);
 	pid = fork();
 	if (pid == 0)
-	{
-		signal(SIGINT, SIG_DFL);
-		signal(SIGQUIT, SIG_DFL);
-		if (setup_redirections(cmd) == -1)
-			return (free_and_exit(sh, 1));
-		if (is_builtin(cmd->argv[0]))
-		{
-			sh->exit_status = exec_builtin(sh, cmd, env);
-			free_and_exit(sh, sh->exit_status);
-		}
-		execve_cmd(sh, cmd, env);
-	}
+		exec_in_child(sh, cmd, env);
 	else
-		wait_child(sh, pid);
-	if (saved_ok)
-		tcsetattr(STDIN_FILENO, TCSANOW, &saved_term);
+		handle_parent(sh, pid, &saved_term, saved_ok);
 }
 
 void	wait_child(t_shell *sh, pid_t pid)
 {
 	int	status;
+	int	sig;
 
+	status = 0;
 	waitpid(pid, &status, 0);
+	sig = WTERMSIG(status);
+	if (WIFSIGNALED(status))
+	{
+		if (sig == SIGINT)
+			write(STDOUT_FILENO, "\n", 1);
+		sh->exit_status = 128 + sig;
+		return ;
+	}
 	if (WIFEXITED(status))
 		sh->exit_status = WEXITSTATUS(status);
 	else
@@ -52,30 +49,13 @@ void	wait_child(t_shell *sh, pid_t pid)
 
 void	execve_cmd(t_shell *sh, t_cmd *cmd, char ***env)
 {
-	char		*full_cmd_path;
-
 	if (!cmd || !cmd->argv || !cmd->argv[0])
 	{
 		command_not_found(NULL);
 		free_and_exit(sh, 127);
 	}
-	if (has_slash(cmd->argv[0]) && is_executable_file(cmd->argv[0]))
-	{
-		execve(cmd->argv[0], cmd->argv, *env);
-		perror(cmd->argv[0]);
-		free_and_exit(sh, 126);
-	}
-	full_cmd_path = resolve_cmd(sh, *env, cmd->argv[0]);
-	if (!full_cmd_path)
-	{
-		command_not_found(cmd->argv[0]);
-		free(full_cmd_path);
-		free_and_exit(sh, 127);
-	}
-	execve(full_cmd_path, cmd->argv, *env);
-	free(full_cmd_path);
-	perror(cmd->argv[0]);
-	free_and_exit(sh, 126);
+	exec_slash_cmd(sh, cmd, env);
+	exec_resolved_cmd(sh, cmd, env);
 }
 
 void	process_single_cmd(t_shell *sh, t_cmd *cmd, char ***env)

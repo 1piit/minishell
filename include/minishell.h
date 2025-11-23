@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/23 17:37:14 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 19:49:26 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -233,6 +233,11 @@ void		exec_init(t_exec *exec, t_cmd *cmd);
 void		wait_child(t_shell *sh, pid_t pid);
 void		wait_all_childs(t_shell *sh, t_exec *exec);
 void		execve_cmd(t_shell *sh, t_cmd *cmd, char ***env);
+void		exec_slash_cmd(t_shell *sh, t_cmd *cmd, char ***env);
+void		exec_resolved_cmd(t_shell *sh, t_cmd *cmd, char ***env);
+void		exec_in_child(t_shell *sh, t_cmd *cmd, char ***env);
+void		handle_parent(t_shell *sh, pid_t pid, struct termios *saved_term,
+				int saved_ok);
 // REDIR
 int			redir_apply_in(t_redir *r);
 int			redir_apply_out(t_redir *r);
@@ -240,6 +245,7 @@ int			apply_append(t_redir *r);
 int			handle_heredoc(t_shell *sh, t_redir *r);
 int			handle_heredocs(t_shell *sh, t_redir *r);
 int			has_heredoc(t_redir *r);
+void		heredoc_setup(t_shell *sh);
 
 // === TEST_UTILS ===
 void		assert_eq(int value, int expected, char *file, int line);
@@ -273,6 +279,8 @@ void		setup_signals(void);
 void		handler_heredoc(int signum);
 void		heredoc_signal_cleanup(void);
 t_hdoc_ctx	**get_heredoc_ctx(void);
+int			init_heredoc_ctx(t_hdoc_ctx *c, t_shell *sh);
+int			handle_fork_error(t_hdoc_ctx *c);
 void		setup_signals_heredoc(void);
 void		heredoc_sigint(int sig);
 void		cmd_handler(int signum);
