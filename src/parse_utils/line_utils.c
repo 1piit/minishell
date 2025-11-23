@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 06:30:00 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/22 09:00:07 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 16:18:56 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,7 @@ t_cmd	*parse_line(t_shell *sh, char *line)
 
 	sh->lx = ft_calloc(1, sizeof(t_lexer));
 	if (!sh->lx)
-	{
-		printf("fonction: exit_all + free_all");
-		return (NULL);
-	}
+		return (free_exit_sh(sh), NULL);
 	tokenize(sh, line, sh->env);
 	cmds = parser(sh);
 	if (sh->lx && sh->lx->head)
@@ -58,6 +55,6 @@ void	free_parsed_cmds(t_shell *sh)
 	sh->lx->cmds = NULL;
 	if (sh->lx->word)
 		free(sh->lx->word);
-	free(sh->lx);
+	free_lx_sh(sh->lx);
 	sh->lx = NULL;
 }

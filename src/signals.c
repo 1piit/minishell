@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 16:25:44 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/21 18:51:33 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 17:29:08 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,9 @@ void	handler_heredoc(int signum)
 {
 	(void)signum;
 	g_signal = SIGINT;
+	write(STDOUT_FILENO, "\n", 1);
+	heredoc_signal_cleanup();
+	exit(130);
 }
 
 void	cmd_handler(int signum)

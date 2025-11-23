@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 18:17:32 by pbride            #+#    #+#             */
-/*   Updated: 2025/11/22 13:23:48 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 17:38:36 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,8 +61,8 @@ void	wait_all_childs(t_shell *sh, t_exec *exec)
 
 void	close_other_cmds_heredoc_fds(t_shell *sh, t_cmd *cmd)
 {
-	t_cmd    *it;
-	t_redir  *rr;
+	t_cmd	*it;
+	t_redir	*rr;
 
 	it = sh->cmds_head;
 	while (it)

@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 13:20:00 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/22 13:23:48 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 14:37:42 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,9 @@
 void	child_setup_signals_and_io(t_shell *sh, t_exec *exec,
 		t_cmd *cmd, int (*pipes)[2])
 {
-	(void)sh;
 	struct sigaction	sa;
 
+	(void)sh;
 	sigemptyset(&sa.sa_mask);
 	sa.sa_flags = 0;
 	sa.sa_handler = SIG_DFL;

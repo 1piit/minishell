@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:54:05 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/22 07:48:52 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 14:22:28 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,7 @@ char	*get_env_value(t_shell *sh, char **envp, char *name)
 		i++;
 	}
 	free(prefix);
-	return (ft_strdup(""));
+	return (NULL);
 }
 
 int	copy_var_value(t_shell *sh, char *dst, const char *src, int *i)

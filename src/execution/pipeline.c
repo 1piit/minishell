@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/07 00:07:11 by pbride            #+#    #+#             */
-/*   Updated: 2025/11/22 13:23:48 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 15:10:00 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,14 +18,14 @@ static void	run_cmd(t_shell *sh, t_cmd *cmd)
 	{
 		sh->exit_status = 0;
 		free_inherited_state(sh);
-		_exit(sh->exit_status);
+		exit(sh->exit_status);
 	}
 	if (is_builtin(cmd->argv[0]))
 		sh->exit_status = exec_builtin(sh, cmd, &sh->env);
 	else
 		execve_cmd(sh, cmd, &sh->env);
 	free_inherited_state(sh);
-	_exit(sh->exit_status);
+	exit(sh->exit_status);
 }
 
 void	process_childs(t_shell *sh, t_exec *exec, t_cmd *cmd,
@@ -40,6 +40,10 @@ void	process_childs(t_shell *sh, t_exec *exec, t_cmd *cmd,
 		free_exec_sh(sh->exec);
 		sh->exec = NULL;
 	}
+	if (exec->pipes)
+		free(exec->pipes);
+	if (exec->pids)
+		free(exec->pids);
 	run_cmd(sh, cmd);
 }
 

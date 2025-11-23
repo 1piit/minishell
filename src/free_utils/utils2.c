@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 22:05:21 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/22 11:43:48 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 17:05:26 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,16 @@
 
 void	exec_destroy(t_exec *exec)
 {
-	free(exec->pipes);
-	free(exec->pids);
+	if (exec->pipes)
+	{
+		free(exec->pipes);
+		exec->pipes = NULL;
+	}
+	if (exec->pids)
+	{
+		free(exec->pids);
+		exec->pids = NULL;
+	}
 }
 
 void	free_redir(t_redir *redir)
@@ -60,10 +68,13 @@ void	free_inherited_state(t_shell *sh)
 		free_tab(sh->env);
 	if (sh->g_env)
 		free_tab(sh->g_env);
-	if (sh->lx)
-		free_lx_sh(sh->lx);
 	if (sh->cmds_head)
 		free_cmds_sh(sh->cmds_head);
+	if (sh->lx)
+	{
+		sh->lx->cmds = NULL;
+		free_lx_sh(sh->lx);
+	}
 	if (sh->exec)
 		free_exec_sh(sh->exec);
 	if (sh->rdoc)
@@ -73,5 +84,5 @@ void	free_inherited_state(t_shell *sh)
 void	free_and_exit(t_shell *sh, int code)
 {
 	free_inherited_state(sh);
-	_exit(code);
+	exit(code);
 }

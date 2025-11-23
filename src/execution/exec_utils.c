@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/07 00:08:24 by pbride            #+#    #+#             */
-/*   Updated: 2025/11/22 06:01:27 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 14:30:08 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,16 +76,21 @@ int	is_executable_file(char *path)
 	return (1);
 }
 
-char	*resolve_cmd(char *cmd)
+char	*resolve_cmd(t_shell *sh, char **envp, char *cmd)
 {
 	char	*path;
 	char	**dirs;
 	char	**dirs_start;
 	char	*full_cmd_path;
 
-	path = getenv("PATH");
+	path = get_env_value(sh, envp, "PATH");
 	if (!path)
-		exit(1);
+	{
+		write(2, cmd, ft_strlen(cmd));
+		ft_putstr_fd(": command not found\n", 2);
+		free_exit_sh(sh);
+		exit(127);
+	}
 	dirs = ft_split(path, ':');
 	dirs_start = dirs;
 	while (*dirs)
@@ -96,5 +101,6 @@ char	*resolve_cmd(char *cmd)
 		free(full_cmd_path);
 		dirs++;
 	}
+	free(path);
 	return (free_tab(dirs_start), NULL);
 }

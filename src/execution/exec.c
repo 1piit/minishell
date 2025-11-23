@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 20:41:13 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/22 12:00:20 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 14:48:20 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,15 +50,6 @@ void	wait_child(t_shell *sh, pid_t pid)
 		sh->exit_status = 1;
 }
 
-void	exec_init(t_exec *exec, t_cmd *cmd)
-{
-	exec->nb_cmds = count_cmds(cmd);
-	exec->fd_in = 0;
-	exec->fd_out = 0;
-	exec->pipes = NULL;
-	exec->pids = NULL;
-}
-
 void	execve_cmd(t_shell *sh, t_cmd *cmd, char ***env)
 {
 	char		*full_cmd_path;
@@ -74,7 +65,7 @@ void	execve_cmd(t_shell *sh, t_cmd *cmd, char ***env)
 		perror(cmd->argv[0]);
 		free_and_exit(sh, 126);
 	}
-	full_cmd_path = resolve_cmd(cmd->argv[0]);
+	full_cmd_path = resolve_cmd(sh, *env, cmd->argv[0]);
 	if (!full_cmd_path)
 	{
 		command_not_found(cmd->argv[0]);
