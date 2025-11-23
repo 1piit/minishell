@@ -6,25 +6,24 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 18:30:00 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/29 17:41:03 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 23:33:29 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	errmsg(int special_count, t_token *line)
+int	errmsg(t_token *line)
 {
-	if (special_count <= 1)
-		return (0);
 	if (line->type == T_PIPE)
-		printf("Minishell: syntax error near unexpected token `|'\n");
+		write(2, "Minishell: syntax error near unexpected token `|'\n", 50);
 	else if (line->type == T_HEREDOC)
-		printf("Minishell: syntax error near unexpected token `newline'\n");
+		write(2, "Minishell: syntax error near unexpected"
+			" token `newline'\n", 56);
 	else if (line->type == T_APPEND)
-		printf("Minishell: syntax error near unexpected token `>'\n");
+		write(2, "Minishell: syntax error near unexpected token `>>'\n", 51);
 	else if (line->type == T_REDIR_IN)
-		printf("Minishell: syntax error near unexpected token `<'\n");
+		write(2, "Minishell: syntax error near unexpected token `<'\n", 50);
 	else if (line->type == T_REDIR_OUT)
-		printf("Minishell: syntax error near unexpected token `>>'\n");
-	return (1);
+		write(2, "Minishell: syntax error near unexpected token `>'\n", 50);
+	return (0);
 }

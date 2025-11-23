@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 06:40:00 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/22 08:46:40 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 23:54:49 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,8 +64,11 @@ int	handle_operator_node(t_token **line, t_cmd **head, t_cmd **last)
 		}
 		return (0);
 	}
-	if (handle_specials(line) < 0)
-		return (-1);
+	if ((*line)->type == T_PIPE)
+	{
+		*line = (*line)->next;
+		return (0);
+	}
 	return (0);
 }
 

@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/23 19:20:39 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/22 08:46:40 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 23:48:34 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,8 @@ t_cmd	*parse_all(t_shell *sh, t_token **line_ptr)
 	line = *line_ptr;
 	head = NULL;
 	last = NULL;
+	if (handle_specials(&line) == -1)
+		return (NULL);
 	if (process_line_sequence(&line, &head, &last) == -1)
 	{
 		free_all_cmds(head);

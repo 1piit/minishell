@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/23 20:56:50 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 23:33:42 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,7 +193,7 @@ int			get_part(t_shell *sh, const char *line, int *i, char **part);
 
 // === PARSER ===
 t_cmd		*parser(t_shell *sh);
-int			errmsg(int special_count, t_token *line);
+int			errmsg(t_token *line);
 int			handle_specials(t_token **line);
 void		append_cmd(t_cmd **head, t_cmd **last, t_cmd *cmd);
 int			process_and_append(t_token **line_ptr, t_cmd **head,
