@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 13:48:02 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/23 19:49:26 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 20:56:50 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -165,10 +165,10 @@ int			my_exit(t_shell *sh);
 // === MINISHELL ===
 int			main(int ac, char **av, char **envp);
 void		minishell_loop(t_shell *sh);
-int			init_env(t_shell *sh, char **envp);
+int			init_env(t_shell *sh, char **envp, char **argv);
 char		*token_type_to_str(t_tokentype type);
 void		exec_destroy(t_exec *exec);
-int			create_default_env(t_shell *sh);
+int			create_default_env(t_shell *sh, char *prog_name);
 int			copy_envp(t_shell *sh, char **envp);
 int			increment_shlvl_in_env(t_shell *sh);
 t_cmd		*parse_line(t_shell *sh, char *line);

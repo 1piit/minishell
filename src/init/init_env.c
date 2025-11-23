@@ -6,19 +6,23 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 15:11:17 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/22 06:21:34 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 20:11:36 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	init_env(t_shell *sh, char **envp)
+int	init_env(t_shell *sh, char **envp, char **argv)
 {
 	char	*val;
+	char	*arg;
 
+	arg = NULL;
 	if (!envp || !envp[0])
 	{
-		if (create_default_env(sh) == ERR)
+		if (argv)
+			arg = argv[0];
+		if (create_default_env(sh, arg) == ERR)
 			return (ERR);
 		return (0);
 	}
@@ -28,6 +32,8 @@ int	init_env(t_shell *sh, char **envp)
 	if (!val || ft_strlen(val) == 0)
 		update_env_var(&sh->env, "HOME", "/");
 	free(val);
+	if (argv && argv[0])
+		update_env_var(&sh->env, "_", argv[0]);
 	increment_shlvl_in_env(sh);
 	return (0);
 }

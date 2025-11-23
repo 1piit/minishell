@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:39:17 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/23 15:45:22 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 20:08:07 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,8 @@ int	main(int argc, char **argv, char **envp)
 	t_shell	sh;
 
 	(void)argc;
-	(void)argv;
 	sh = (t_shell){0};
-	if (init_env(&sh, envp) == ERR)
+	if (init_env(&sh, envp, argv) == ERR)
 		return (1);
 	tcgetattr(STDIN_FILENO, &sh.g_saved_term);
 	g_signal = 0;

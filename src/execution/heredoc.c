@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 17:15:13 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/23 19:44:55 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 21:15:29 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ static int	finish_heredoc(t_hdoc_ctx *c, t_redir *r)
 	if (WIFEXITED(c->status) && WEXITSTATUS(c->status) == 2)
 	{
 		ft_putstr_fd("bash: warning: here-document at"
-			"line 1 delimited by end-of-file (wanted `", STDERR_FILENO);
+			" line ? delimited by end-of-file (wanted `", STDERR_FILENO);
 		ft_putstr_fd(r->file, STDERR_FILENO);
 		ft_putstr_fd("')\n", STDERR_FILENO);
 	}
@@ -49,12 +49,6 @@ static int	heredoc_loop(t_shell *sh, t_redir *r, int write_fd)
 	while (1)
 	{
 		line = readline("> ");
-		if (g_signal == SIGINT)
-		{
-			if (line)
-				free(line);
-			return (130);
-		}
 		if (!line)
 			return (free(line), 2);
 		if (ft_strcmp(line, r->file) == 0)

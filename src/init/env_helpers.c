@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 06:20:00 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/22 08:28:38 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 20:18:15 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,29 +14,28 @@
 
 static int	alloc_default_env(t_shell *sh)
 {
-	char	*home;
+	char	cwd[4096];
 
-	home = getenv("HOME");
-	sh->env = malloc(sizeof(char *) * 3);
+	sh->env = malloc(sizeof(char *) * 4);
 	if (!sh->env)
 		return (ERR);
-	if (home && ft_strlen(home) > 0)
+	if (getcwd(cwd, sizeof(cwd)))
 	{
-		sh->env[0] = ft_strjoin("HOME=", home);
+		sh->env[0] = ft_strjoin("PWD=", cwd);
 		if (!sh->env[0])
 		{
-			sh->env[0] = ft_strdup("HOME=/");
+			sh->env[0] = ft_strdup("PWD=/");
 			if (!sh->env[0])
 				return (free(sh->env), ERR);
 		}
 	}
 	else
 	{
-		sh->env[0] = ft_strdup("HOME=/");
+		sh->env[0] = ft_strdup("PWD=/");
 		if (!sh->env[0])
 			return (free(sh->env), ERR);
 	}
-	sh->env[2] = NULL;
+	sh->env[3] = NULL;
 	return (0);
 }
 
@@ -48,40 +47,25 @@ static int	set_shlvl_default(t_shell *sh)
 	return (0);
 }
 
-int	create_default_env(t_shell *sh)
+static int	set_underscore_default(t_shell *sh, char *prog_name)
+{
+	if (prog_name)
+		sh->env[2] = ft_strjoin("_=", prog_name);
+	else
+		sh->env[2] = ft_strdup("_=/usr/bin/env");
+	if (!sh->env[2])
+		return (ERR);
+	return (0);
+}
+
+int	create_default_env(t_shell *sh, char *prog_name)
 {
 	if (alloc_default_env(sh) == ERR)
 		return (ERR);
 	if (set_shlvl_default(sh) == ERR)
 		return (free_tab(sh->env), ERR);
-	return (0);
-}
-
-int	copy_envp(t_shell *sh, char **envp)
-{
-	int	i;
-	int	count;
-
-	i = 0;
-	while (envp[i])
-		i++;
-	count = i;
-	sh->env = malloc(sizeof(char *) * (count + 1));
-	if (!sh->env)
-		return (ERR);
-	i = 0;
-	while (envp[i])
-	{
-		sh->env[i] = ft_strdup(envp[i]);
-		if (!sh->env[i])
-		{
-			while (i > 0)
-				free(sh->env[--i]);
-			return (free(sh->env), ERR);
-		}
-		i++;
-	}
-	sh->env[i] = NULL;
+	if (set_underscore_default(sh, prog_name) == ERR)
+		return (free_tab(sh->env), ERR);
 	return (0);
 }
 

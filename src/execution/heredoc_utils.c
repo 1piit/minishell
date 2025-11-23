@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/20 20:38:20 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/23 19:43:47 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 21:18:55 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,5 +53,9 @@ void	heredoc_signal_cleanup(void)
 	{
 		free_inherited_state((*ctx_ptr)->cleanup_sh);
 		(*ctx_ptr)->cleanup_sh = NULL;
+		if ((*ctx_ptr)->fd[0] != -1)
+			close((*ctx_ptr)->fd[0]);
+		if ((*ctx_ptr)->fd[1] != -1)
+			close((*ctx_ptr)->fd[1]);
 	}
 }
