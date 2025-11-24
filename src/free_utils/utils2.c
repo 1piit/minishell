@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 22:05:21 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/23 17:05:26 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/24 14:38:00 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ void	free_redir(t_redir *redir)
 {
 	t_redir	*tmp;
 
+	tmp = NULL;
 	while (redir)
 	{
 		tmp = redir->next;
@@ -50,6 +51,7 @@ void	free_tokens_2(t_token *head)
 {
 	t_token	*tmp;
 
+	tmp = NULL;
 	while (head)
 	{
 		tmp = head->next;

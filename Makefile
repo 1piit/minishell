@@ -256,7 +256,7 @@ $(MS_OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 # ===================================================
 clean:
 	@printf "$(RED)Cleaning objects...$(NC)\n"
-	@rm -rf $(OBJ_DIR) 2>/dev/null
+	@rm -rf $(MS_OBJ_DIR) 2>/dev/null
 	@$(MAKE) -C $(LIBFT_DIR) clean >/dev/null 2>&1
 	@sleep 0.1
 
@@ -277,8 +277,8 @@ tags: ${SRCS}
 v: tags
 	vim ${SRCS} minishell.h Makefile
 
-supp.supp:
-	echo "{\nignore_libreadline_leaks\nMemcheck:Leak\n...\nobj:*/libreadline.so.*\n}" > supp.supp
-
-val: supp.supp ${NAME}
+valsupp: ${NAME}
 	valgrind --suppressions=readline.supp --leak-check=full --show-leak-kinds=all --show-reachable=yes --track-origins=yes --trace-children=yes --track-fds=yes --undef-value-errors=yes ./minishell
+
+val: ${NAME}
+	valgrind --leak-check=full --show-leak-kinds=all --show-reachable=yes --track-origins=yes --trace-children=yes --track-fds=yes --undef-value-errors=yes ./minishell

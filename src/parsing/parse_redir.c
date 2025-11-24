@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 15:42:06 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/21 22:25:53 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/24 14:49:27 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,13 +37,14 @@ static int	process_redir_entry(t_token **current, t_cmd *cmd,
 	t_redir	*new;
 	t_redir	**redir_list;
 
+	(void)special_count;
 	tok = *current;
 	if (!(tok->type == T_REDIR_IN || tok->type == T_REDIR_OUT
 			|| tok->type == T_APPEND || tok->type == T_HEREDOC))
 		return (0);
 	if (!tok->next || tok->next->type != T_WORD)
 	{
-		errmsg(special_count, line);
+		errmsg(line);
 		return (-1);
 	}
 	new = create_redir(tok);

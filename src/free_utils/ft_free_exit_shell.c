@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/21 21:19:31 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/22 12:24:14 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/24 14:39:48 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,27 +33,14 @@ void	free_lx_sh(t_lexer *lx)
 void	free_cmds_sh(t_cmd *cmd)
 {
 	t_cmd	*tmp_cmd;
-	t_redir	*tmp_redir;
 
+	tmp_cmd = NULL;
 	while (cmd)
 	{
 		tmp_cmd = cmd->next;
 		if (cmd->argv)
 			free_tab(cmd->argv);
-		while (cmd->redir)
-		{
-			tmp_redir = cmd->redir->next;
-			if (cmd->redir->file)
-				free(cmd->redir->file);
-			if (cmd->redir->tmp_file)
-				free(cmd->redir->tmp_file);
-			if (cmd->redir->tmp_fd > 0)
-				close(cmd->redir->tmp_fd);
-			if (cmd->redir->h_fd > 0)
-				close(cmd->redir->h_fd);
-			free(cmd->redir);
-			cmd->redir = tmp_redir;
-		}
+		free_redirs(cmd->redir);
 		free(cmd);
 		cmd = tmp_cmd;
 	}
@@ -72,6 +59,7 @@ void	free_rdocs_sh(t_heredoc *rdoc)
 {
 	t_heredoc	*tmp_rdoc;
 
+	tmp_rdoc = NULL;
 	while (rdoc)
 	{
 		tmp_rdoc = rdoc->next;

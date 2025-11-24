@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/22 06:40:00 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/23 23:54:49 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/24 14:50:43 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ int	handle_operator_node(t_token **line, t_cmd **head, t_cmd **last)
 	{
 		if (process_and_append(line, head, last) != 0)
 		{
-			perror("parse_command");
+			perror("Error: ");
 			return (-1);
 		}
 		return (0);
@@ -84,7 +84,7 @@ int	process_line_sequence(t_token **line, t_cmd **head, t_cmd **last)
 		}
 		if (process_and_append(line, head, last) != 0)
 		{
-			perror("parse_command");
+			perror("Error :");
 			return (-1);
 		}
 	}
