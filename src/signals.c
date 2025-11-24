@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/03 16:25:44 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 23:00:07 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 19:21:59 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,14 +29,24 @@ void	sigquit_handler(int signum)
 
 void	setup_signals(void)
 {
-	signal(SIGINT, sigint_handler);
-	signal(SIGQUIT, SIG_IGN);
+	struct sigaction	sa;
+
+	rl_catch_signals = 0;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_flags = 0;
+	sa.sa_handler = sigint_handler;
+	sigaction(SIGINT, &sa, NULL);
+	sa.sa_handler = SIG_IGN;
+	sigaction(SIGQUIT, &sa, NULL);
 }
 
 void	handler_heredoc(int signum)
 {
 	(void)signum;
 	g_signal = SIGINT;
+	write(STDOUT_FILENO, "\n", 1);
+	heredoc_signal_cleanup();
+	exit(130);
 }
 
 void	cmd_handler(int signum)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exec_utils.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/11/07 00:08:24 by pbride            #+#    #+#             */
-/*   Updated: 2025/11/13 15:03:19 by pbride           ###   ########.fr       */
+/*   Created: 2025/11/23 19:52:07 by rgalmich          #+#    #+#             */
+/*   Updated: 2025/11/23 19:52:10 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@ int	count_cmds(t_cmd *cmds)
 
 int	has_slash(char *str)
 {
+	if (!str)
+		return (0);
 	while (*str)
 	{
 		if (*str == '/')
@@ -74,16 +76,21 @@ int	is_executable_file(char *path)
 	return (1);
 }
 
-char	*resolve_cmd(char *cmd)
+char	*resolve_cmd(t_shell *sh, char **envp, char *cmd)
 {
 	char	*path;
 	char	**dirs;
 	char	**dirs_start;
 	char	*full_cmd_path;
 
-	path = getenv("PATH");
+	path = get_env_value(sh, envp, "PATH");
 	if (!path)
-		exit(1);
+	{
+		write(2, cmd, ft_strlen(cmd));
+		ft_putstr_fd(": command not found\n", 2);
+		free_exit_sh(sh);
+		exit(127);
+	}
 	dirs = ft_split(path, ':');
 	dirs_start = dirs;
 	while (*dirs)
@@ -91,7 +98,9 @@ char	*resolve_cmd(char *cmd)
 		full_cmd_path = join_path(*dirs, cmd);
 		if (is_executable_file(full_cmd_path))
 			return (free_tab(dirs_start), full_cmd_path);
+		free(full_cmd_path);
 		dirs++;
 	}
+	free(path);
 	return (free_tab(dirs_start), NULL);
 }

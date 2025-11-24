@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:53:40 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 23:01:26 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/21 20:19:40 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ int	my_env(char **envp)
 
 	if (!envp)
 	{
-		fprintf(stderr, "env: no environment found\n");
+		write(STDERR_FILENO, "env: no environment found\n", 28);
 		return (1);
 	}
 	i = 0;

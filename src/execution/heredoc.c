@@ -6,65 +6,108 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 17:15:13 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 23:00:07 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 21:15:29 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static void	run_heredoc_child(t_redir *r, int write_fd)
+static int	finish_heredoc(t_hdoc_ctx *c, t_redir *r)
 {
-	char	*line;
-
-	signal(SIGINT, SIG_DFL);
-	signal(SIGQUIT, SIG_IGN);
-	rl_clear_history();
-	while (1)
+	waitpid(c->pid, &c->status, 0);
+	signal(SIGINT, c->old_handler);
+	if (c->saved_ok)
+		tcsetattr(STDIN_FILENO, TCSANOW, &c->saved_term);
+	if (WIFSIGNALED(c->status) && WTERMSIG(c->status) == SIGINT)
 	{
-		line = readline("> ");
-		if (!line || ft_strcmp(line, r->file) == 0)
-		{
-			free(line);
-			break ;
-		}
-		write(write_fd, line, ft_strlen(line));
-		write(write_fd, "\n", 1);
-		free(line);
+		ft_putstr_fd("\n", STDOUT_FILENO);
+		if (r->tmp_fd > 0)
+			close(r->tmp_fd);
+		return (close(c->fd[0]), -1);
 	}
-	close(write_fd);
-	exit(0);
-}
-
-int	handle_heredoc(t_redir *r)
-{
-	pid_t	pid;
-	int		fd[2];
-	int		status;
-	void	(*old_sigint)(int);
-
-	if (pipe(fd) == -1)
-		return (perror("pipe"), -1);
-	old_sigint = signal(SIGINT, SIG_IGN);
-	pid = fork();
-	if (pid < 0)
-		return (perror("fork"), -1);
-	if (pid == 0)
+	if (WIFEXITED(c->status) && WEXITSTATUS(c->status) == 130)
 	{
-		close(fd[0]);
-		run_heredoc_child(r, fd[1]);
+		ft_putstr_fd("\n", STDOUT_FILENO);
+		return (close(c->fd[0]), -1);
 	}
-	close(fd[1]);
-	waitpid(pid, &status, 0);
-	signal(SIGINT, old_sigint);
-	if (WIFSIGNALED(status) && WTERMSIG(status) == SIGINT)
-		return (close(fd[0]), -1);
-	if (WIFEXITED(status) && WEXITSTATUS(status) == 130)
-		return (close(fd[0]), -1);
-	r->tmp_fd = fd[0];
+	if (WIFEXITED(c->status) && WEXITSTATUS(c->status) == 2)
+	{
+		ft_putstr_fd("bash: warning: here-document at"
+			" line ? delimited by end-of-file (wanted `", STDERR_FILENO);
+		ft_putstr_fd(r->file, STDERR_FILENO);
+		ft_putstr_fd("')\n", STDERR_FILENO);
+	}
+	r->tmp_fd = c->fd[0];
 	return (0);
 }
 
-int	handle_heredocs(t_redir *redir)
+static int	heredoc_loop(t_shell *sh, t_redir *r, int write_fd)
+{
+	char	*line;
+	char	*expanded;
+
+	while (1)
+	{
+		line = readline("> ");
+		if (!line)
+			return (free(line), 2);
+		if (ft_strcmp(line, r->file) == 0)
+			return (free(line), 0);
+		expanded = expand_vars(sh, line, 1);
+		if (expanded)
+		{
+			write(write_fd, expanded, ft_strlen(expanded));
+			write(write_fd, "\n", 1);
+			free(expanded);
+		}
+		free(line);
+	}
+}
+
+static void	run_heredoc_child(t_shell *sh, t_redir *r, int write_fd)
+{
+	t_hdoc_ctx	**ctx_ptr;
+	int			res;
+
+	rl_catch_signals = 0;
+	setup_signals_heredoc();
+	res = heredoc_loop(sh, r, write_fd);
+	close(write_fd);
+	ctx_ptr = get_heredoc_ctx();
+	*ctx_ptr = NULL;
+	free_inherited_state(sh);
+	if (g_signal == SIGINT || res == 130)
+		exit(130);
+	exit(res);
+}
+
+int	handle_heredoc(t_shell *sh, t_redir *r)
+{
+	t_hdoc_ctx	c;
+	t_hdoc_ctx	**ctx_ptr;
+	int			status_sig_rdoc;
+
+	if (init_heredoc_ctx(&c, sh) == -1)
+		return (-1);
+	c.pid = fork();
+	if (c.pid < 0)
+		return (handle_fork_error(&c));
+	if (c.pid == 0)
+	{
+		close(c.fd[0]);
+		run_heredoc_child(sh, r, c.fd[1]);
+	}
+	close(c.fd[1]);
+	status_sig_rdoc = finish_heredoc(&c, r);
+	ctx_ptr = get_heredoc_ctx();
+	*ctx_ptr = NULL;
+	if (status_sig_rdoc == -1)
+		return (-1);
+	r->tmp_fd = c.fd[0];
+	return (status_sig_rdoc);
+}
+
+int	handle_heredocs(t_shell *sh, t_redir *redir)
 {
 	t_redir	*r;
 
@@ -72,7 +115,7 @@ int	handle_heredocs(t_redir *redir)
 	while (r)
 	{
 		if (r->type == T_HEREDOC)
-			if (handle_heredoc(r) == -1)
+			if (handle_heredoc(sh, r) == -1)
 				return (-1);
 		r = r->next;
 	}

@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/10 17:13:42 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 20:19:25 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 21:10:52 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ int	is_heredoc(t_redir *r)
 {
 	if (dup2(r->tmp_fd, STDIN_FILENO) == -1)
 		return (perror("dup2 heredoc"), -1);
+	close(r->tmp_fd);
 	return (0);
 }
 

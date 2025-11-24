@@ -6,31 +6,32 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/14 15:11:17 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 17:27:39 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/24 14:41:30 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	init_env(t_shell *sh, char **envp)
+int	init_env(t_shell *sh, char **envp, char **argv)
 {
-	int		i;
+	char	*val;
+	char	*arg;
 
-	if (!envp)
-		return (0); // a voir ce quon fait si on doit lancer un shell sans env
-	i = 0;
-	while (envp[i])
-		i++;
-	sh->env = malloc(sizeof(char *) * (i + 1));
-	if (!sh->env)
-		return (ERR);
-	i = 0;
-	while (envp[i])
+	(void)val;
+	arg = NULL;
+	if (!envp || !envp[0])
 	{
-		sh->env[i] = ft_strdup(envp[i]);
-		i++;
+		if (argv)
+			arg = argv[0];
+		if (create_default_env(sh, arg) == ERR)
+			return (ERR);
+		return (0);
 	}
-	sh->env[i] = NULL;
+	if (copy_envp(sh, envp) == ERR)
+		return (ERR);
+	if (argv && argv[0])
+		update_env_var(&sh->env, "_", argv[0]);
+	increment_shlvl_in_env(sh);
 	return (0);
 }
 

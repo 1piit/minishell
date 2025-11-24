@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parse_redir.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 15:42:06 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/10 18:37:12 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/24 14:49:27 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,11 @@ static t_redir	*create_redir(t_token *tok)
 		return (NULL);
 	new->type = tok->type;
 	new->file = ft_strdup(tok->next->word);
+	if (!new->file)
+		return (free(new), NULL);
+	new->h_fd = -1;
+	new->tmp_fd = -1;
+	new->tmp_file = NULL;
 	new->next = NULL;
 	return (new);
 }
@@ -32,18 +37,19 @@ static int	process_redir_entry(t_token **current, t_cmd *cmd,
 	t_redir	*new;
 	t_redir	**redir_list;
 
+	(void)special_count;
 	tok = *current;
 	if (!(tok->type == T_REDIR_IN || tok->type == T_REDIR_OUT
 			|| tok->type == T_APPEND || tok->type == T_HEREDOC))
 		return (0);
 	if (!tok->next || tok->next->type != T_WORD)
 	{
-		errmsg(special_count, line);
-		return (0);
+		errmsg(line);
+		return (-1);
 	}
 	new = create_redir(tok);
 	if (!new)
-		return (0);
+		return (-1);
 	redir_list = &cmd->redir;
 	while (*redir_list)
 		redir_list = &(*redir_list)->next;
@@ -52,12 +58,18 @@ static int	process_redir_entry(t_token **current, t_cmd *cmd,
 	return (1);
 }
 
-void	parse_redirections(t_token **current, t_cmd *cmd,
+int	parse_redirections(t_token **current, t_cmd *cmd,
 				int special_count, t_token *line)
 {
+	int	ret;
+
 	while (*current)
 	{
-		if (process_redir_entry(current, cmd, special_count, line) == 0)
+		ret = process_redir_entry(current, cmd, special_count, line);
+		if (ret == -1)
+			return (-1);
+		if (ret == 0)
 			break ;
 	}
+	return (0);
 }

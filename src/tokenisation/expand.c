@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:54:05 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 17:56:12 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 14:22:28 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,23 +38,6 @@ char	*expand_vars(t_shell *sh, const char *str, int expand)
 	return (ft_strdup(buf));
 }
 
-/*
-char	*get_env_value(char **env, const char *var)
-{
-	int		i;
-	size_t	len;
-
-	len = ft_strlen(var);
-	i = 0;
-	while (env[i])
-	{
-		if (ft_strncmp(env[i], var, len) == 0 && env[i][len] == '=')
-			return (env[i] + len + 1);
-		i++;
-	}
-	return ("");
-}*/
-
 char	*get_env_value(t_shell *sh, char **envp, char *name)
 {
 	char	*prefix;
@@ -77,7 +60,7 @@ char	*get_env_value(t_shell *sh, char **envp, char *name)
 		i++;
 	}
 	free(prefix);
-	return (ft_strdup(""));
+	return (NULL);
 }
 
 int	copy_var_value(t_shell *sh, char *dst, const char *src, int *i)
@@ -103,5 +86,7 @@ int	copy_var_value(t_shell *sh, char *dst, const char *src, int *i)
 	val = get_env_value(sh, sh->env, name);
 	if (!val)
 		return (0);
-	return (ft_strlcpy(dst, val, 4096));
+	len = ft_strlcpy(dst, val, 4096);
+	free(val);
+	return (len);
 }

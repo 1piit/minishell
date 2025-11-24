@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:54:10 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 18:01:01 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/22 09:50:35 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,8 @@ char	*extract_quoted_part(t_shell *sh, const char *line, int *i, char **env)
 	while (line[*i] && line[*i] != quote)
 		(*i)++;
 	if (!line[*i])
-		return (fprintf(stderr, "syntax error: unclosed quote\n"), NULL);
+		return (write(STDERR_FILENO, "syntax error: unclosed"
+				" quote\n", 29), NULL);
 	part = ft_substr(line, start, *i - start);
 	if (!part)
 		return (NULL);
@@ -35,8 +36,7 @@ char	*extract_quoted_part(t_shell *sh, const char *line, int *i, char **env)
 	if (quote == '"')
 	{
 		expanded = expand_vars(sh, part, 1);
-		free(part);
-		return (expanded);
+		return (free(part), expanded);
 	}
 	return (part);
 }
@@ -92,22 +92,16 @@ int	tokenize_word(t_shell *sh, const char *line, int *i, char **env)
 	(void)env;
 	word = ft_calloc(1, sizeof(char));
 	if (!word)
-	{
-		printf("fonction: exit_all + free_all");
 		return (1);
-	}
 	while (line[*i] && line[*i] != ' ' && !is_operator_char(line[*i]))
 	{
 		if (get_part(sh, line, i, &part) != 0)
-		{
-			free(word);
-			printf("fonction: exit_all + free_all");
-			return (1);
-		}
+			return (free(word), 1);
 		if (append_part(&word, part) != 0)
-			return (printf("fonction: exit_all + free_all"), 1);
+			return (free(word), 1);
 	}
-	add_token(sh, T_WORD, word, 1);
+	if (!add_token(sh, T_WORD, word, 1))
+		return (1);
 	free(word);
 	return (0);
 }

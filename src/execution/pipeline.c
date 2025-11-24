@@ -6,78 +6,80 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/11/07 00:07:11 by pbride            #+#    #+#             */
-/*   Updated: 2025/11/20 23:00:28 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/23 15:10:00 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static void	run_cmd(t_shell *sh, t_cmd *cmd, char ***env)
+static void	run_cmd(t_shell *sh, t_cmd *cmd)
 {
+	if (!cmd || !cmd->argv || !cmd->argv[0])
+	{
+		sh->exit_status = 0;
+		free_inherited_state(sh);
+		exit(sh->exit_status);
+	}
 	if (is_builtin(cmd->argv[0]))
-		sh->exit_status = exec_builtin(sh, cmd, env);
+		sh->exit_status = exec_builtin(sh, cmd, &sh->env);
 	else
-		execve_cmd(cmd, env);
+		execve_cmd(sh, cmd, &sh->env);
+	free_inherited_state(sh);
 	exit(sh->exit_status);
 }
 
-void	process_childs(t_shell *sh, t_exec *exec, t_cmd *cmd, char ***env)
+void	process_childs(t_shell *sh, t_exec *exec, t_cmd *cmd,
+				int (*pipes)[2])
 {
-	int		cmds_index;
-
-	cmds_index = cmd->cmd_index;
-	if (cmds_index > 0)
+	child_setup_signals_and_io(sh, exec, cmd, pipes);
+	close_other_cmds_heredoc_fds(sh, cmd);
+	if (pipes)
+		child_close_local_pipes(pipes, exec->nb_cmds - 1);
+	if (sh->exec)
 	{
-		if (dup2(exec->pipes[cmds_index -1][0], STDIN_FILENO) == -1)
-			pipeline_exit(exec, "dup2 stdin", 1);
+		free_exec_sh(sh->exec);
+		sh->exec = NULL;
 	}
-	if (cmds_index < exec->nb_cmds - 1)
-	{
-		if (dup2(exec->pipes[cmds_index][1], STDOUT_FILENO) == -1)
-			pipeline_exit(exec, "dup2 stdout", 1);
-	}
-	if (setup_redirections(cmd) == -1)
-		pipeline_exit(exec, "redir", 1);
-	close_all_pipes_fds(exec);
-	run_cmd(sh, cmd, env);
+	if (exec->pipes)
+		free(exec->pipes);
+	if (exec->pids)
+		free(exec->pids);
+	run_cmd(sh, cmd);
 }
 
-void	process_parent(int cmds_index, t_exec *exec)
+void	process_parent(int cmds_index, t_exec *exec, int (*pipes)[2])
 {
 	if (cmds_index > 0)
-		close(exec->pipes[cmds_index -1][0]);
+		close(pipes[cmds_index -1][0]);
 	if (cmds_index < exec->nb_cmds - 1)
-		close(exec->pipes[cmds_index][1]);
+		close(pipes[cmds_index][1]);
 }
 
-void	process_pipeline(t_shell *sh, t_exec *exec, t_cmd *cmd, char ***env)
+static int	run_pipeline_children(t_shell *sh, t_exec *exec, t_cmd *cmd)
 {
-	int		cmds_index;
+	struct termios	saved_term;
+	int				saved_ok;
+
+	saved_ok = (tcgetattr(STDIN_FILENO, &saved_term) == 0);
+	spawn_and_wait(sh, exec, cmd);
+	if (saved_ok)
+		tcsetattr(STDIN_FILENO, TCSANOW, &saved_term);
+	exec_destroy(exec);
+	return (0);
+}
+
+int	process_pipeline(t_shell *sh, t_exec *exec, t_cmd *cmd)
+{
 	t_cmd	*tmp;
 
 	tmp = cmd;
 	while (tmp)
 	{
 		if (tmp->redir)
-			if (handle_heredocs(tmp->redir) == -1)
-				return ;
+			if (handle_heredocs(sh, tmp->redir) == -1)
+				return (-1);
 		tmp = tmp->next;
 	}
-	create_pipes(exec);
-	cmds_index = 0;
-	while (cmd && cmds_index < exec->nb_cmds)
-	{
-		cmd->cmd_index = cmds_index;
-		exec->pids[cmds_index] = fork();
-		if (exec->pids[cmds_index] == -1)
-			pipeline_exit(exec, "fork", 1);
-		else if (exec->pids[cmds_index] == 0)
-			process_childs(sh, exec, cmd, env);
-		else
-			process_parent(cmds_index, exec);
-		cmds_index++;
-		cmd = cmd->next;
-	}
-	close_all_pipes_fds(exec);
-	wait_all_childs(sh, exec);
+	exec_init(exec, cmd);
+	return (run_pipeline_children(sh, exec, cmd));
 }

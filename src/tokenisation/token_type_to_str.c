@@ -6,11 +6,13 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 16:54:00 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/10/29 16:54:01 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/22 06:52:50 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+// pour debug
 
 char	*token_type_to_str(t_tokentype type)
 {

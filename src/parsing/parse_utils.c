@@ -3,44 +3,63 @@
 /*                                                        :::      ::::::::   */
 /*   parse_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: pbride <pbride@student.42.fr>              +#+  +:+       +#+        */
+/*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/29 20:50:00 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/10 18:45:55 by pbride           ###   ########.fr       */
+/*   Updated: 2025/11/23 23:48:34 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-static int	count_specials(t_token *line, t_token **last)
+static int	validate_redir(t_token *tok)
 {
-	t_token	*tmp;
-	int		count;
-
-	tmp = line;
-	count = 0;
-	while (tmp && tmp->is_operator && count < 2)
+	if (!tok->next || tok->next->type != T_WORD)
 	{
-		count++;
-		tmp = tmp->next;
+		if (tok->next && tok->next->type == T_PIPE)
+			return (errmsg(tok->next), -1);
+		return (errmsg(tok), -1);
 	}
-	*last = tmp;
-	return (count);
+	return (0);
+}
+
+static int	validate_pipe(t_token *tok, int has_cmd)
+{
+	if (!has_cmd)
+		return (errmsg(tok), -1);
+	if (!tok->next)
+		return (errmsg(tok), -1);
+	if (tok->next->type == T_PIPE)
+		return (errmsg(tok->next), -1);
+	return (0);
 }
 
 int	handle_specials(t_token **line)
 {
-	t_token	*after;
-	int		count;
+	t_token	*tok;
+	int		has_cmd;
 
-	count = count_specials(*line, &after);
-	if (count > 1)
+	tok = *line;
+	has_cmd = 0;
+	while (tok)
 	{
-		errmsg(count, *line);
-		return (-1);
+		if (tok->type == T_WORD)
+			has_cmd = 1;
+		else if (tok->type == T_REDIR_IN || tok->type == T_REDIR_OUT
+			|| tok->type == T_APPEND || tok->type == T_HEREDOC)
+		{
+			if (validate_redir(tok) == -1)
+				return (-1);
+		}
+		else if (tok->type == T_PIPE)
+		{
+			if (validate_pipe(tok, has_cmd) == -1)
+				return (-1);
+			has_cmd = 0;
+		}
+		tok = tok->next;
 	}
-	*line = after;
-	return (count);
+	return (0);
 }
 
 void	append_cmd(t_cmd **head, t_cmd **last, t_cmd *cmd)

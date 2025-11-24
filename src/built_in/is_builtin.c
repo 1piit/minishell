@@ -6,7 +6,7 @@
 /*   By: rgalmich <rgalmich@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/31 18:58:11 by rgalmich          #+#    #+#             */
-/*   Updated: 2025/11/20 17:46:15 by rgalmich         ###   ########.fr       */
+/*   Updated: 2025/11/22 07:31:53 by rgalmich         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ int	exec_builtin(t_shell *sh, t_cmd *cmd, char ***env)
 		return (cd(sh, NULL, env));
 	}
 	else if (!ft_strcmp(cmd->argv[0], "exit"))
-		return (my_exit());
+		return (my_exit(sh));
 	else if (!ft_strcmp(cmd->argv[0], "env"))
 		return (my_env(*env));
 	else if (!ft_strcmp(cmd->argv[0], "export"))
